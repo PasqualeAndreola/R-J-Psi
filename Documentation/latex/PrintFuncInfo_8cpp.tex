@@ -1,0 +1,86 @@
+\hypertarget{PrintFuncInfo_8cpp}{}\doxysection{Source\+Files/\+Print\+Func\+Info.cpp File Reference}
+\label{PrintFuncInfo_8cpp}\index{SourceFiles/PrintFuncInfo.cpp@{SourceFiles/PrintFuncInfo.cpp}}
+
+
+Source file for \mbox{\hyperlink{PrintFuncInfo_8cpp_a361d07be03130dc65230b48fa92c191d}{Print\+Func\+Info}} function implementation.  
+
+
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{PrintFuncInfo_8cpp_a1d90178ce27c0748f7e07319bb752dad}{Print\+Func\+Info}} (vector$<$ T\+String $>$ string2print)
+\begin{DoxyCompactList}\small\item\em Function used to print a banner with function info. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{PrintFuncInfo_8cpp_a361d07be03130dc65230b48fa92c191d}{Print\+Func\+Info}} (std\+::ostream \&stream, vector$<$ T\+String $>$ string2print)
+\begin{DoxyCompactList}\small\item\em Function used to print a banner with function info. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const int \mbox{\hyperlink{PrintFuncInfo_8cpp_a6bf021aaf5106c13824f3d8f61ecd5c1}{ncolumns}} = 55
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Source file for \mbox{\hyperlink{PrintFuncInfo_8cpp_a361d07be03130dc65230b48fa92c191d}{Print\+Func\+Info}} function implementation. 
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{PrintFuncInfo_8cpp_a361d07be03130dc65230b48fa92c191d}\label{PrintFuncInfo_8cpp_a361d07be03130dc65230b48fa92c191d}} 
+\index{PrintFuncInfo.cpp@{PrintFuncInfo.cpp}!PrintFuncInfo@{PrintFuncInfo}}
+\index{PrintFuncInfo@{PrintFuncInfo}!PrintFuncInfo.cpp@{PrintFuncInfo.cpp}}
+\doxysubsubsection{\texorpdfstring{PrintFuncInfo()}{PrintFuncInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Print\+Func\+Info (\begin{DoxyParamCaption}\item[{std\+::ostream \&}]{stream,  }\item[{vector$<$ T\+String $>$}]{string2print }\end{DoxyParamCaption})}
+
+
+
+Function used to print a banner with function info. 
+
+This function is the overloaded version of \mbox{\hyperlink{PrintFuncInfo_8cpp_a1d90178ce27c0748f7e07319bb752dad}{\textbackslash{}n}} The user can set an ofstream to write the output to whatever he/she likes.~\newline
+The developer used this to make unit test.~\newline
+ 
+\begin{DoxyParams}{Parameters}
+{\em stream} & Output where the starred banner has to be written \\
+\hline
+{\em string2print} & vector of T\+String that the user wants to print \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 170 of file Print\+Func\+Info.\+cpp.
+
+\mbox{\Hypertarget{PrintFuncInfo_8cpp_a1d90178ce27c0748f7e07319bb752dad}\label{PrintFuncInfo_8cpp_a1d90178ce27c0748f7e07319bb752dad}} 
+\index{PrintFuncInfo.cpp@{PrintFuncInfo.cpp}!PrintFuncInfo@{PrintFuncInfo}}
+\index{PrintFuncInfo@{PrintFuncInfo}!PrintFuncInfo.cpp@{PrintFuncInfo.cpp}}
+\doxysubsubsection{\texorpdfstring{PrintFuncInfo()}{PrintFuncInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Print\+Func\+Info (\begin{DoxyParamCaption}\item[{vector$<$ T\+String $>$}]{string2print }\end{DoxyParamCaption})}
+
+
+
+Function used to print a banner with function info. 
+
+This function is used to print a banner with some \char`\"{}$\ast$\char`\"{} characters.~\newline
+These \char`\"{}$\ast$\char`\"{} are arranged in a rectangular format.~\newline
+They contains information given by the user as a vector of T\+String.~\newline
+Global variable {\ttfamily ncolumns} can be defined by the user\+: the function will appropriately cut the strings.~\newline
+
+\begin{DoxyParams}{Parameters}
+{\em string2print} & vector of T\+String that the user wants to print \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 26 of file Print\+Func\+Info.\+cpp.
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{PrintFuncInfo_8cpp_a6bf021aaf5106c13824f3d8f61ecd5c1}\label{PrintFuncInfo_8cpp_a6bf021aaf5106c13824f3d8f61ecd5c1}} 
+\index{PrintFuncInfo.cpp@{PrintFuncInfo.cpp}!ncolumns@{ncolumns}}
+\index{ncolumns@{ncolumns}!PrintFuncInfo.cpp@{PrintFuncInfo.cpp}}
+\doxysubsubsection{\texorpdfstring{ncolumns}{ncolumns}}
+{\footnotesize\ttfamily const int ncolumns = 55}
+
+Number of columns of \char`\"{}$\ast$\char`\"{} that will be printed 
+
+Definition at line 23 of file Print\+Func\+Info.\+cpp.
+
