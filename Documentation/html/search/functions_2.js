@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['treereader_17',['TreeReader',['../TreeReader_8h.html#aa6dacd225e785add32f06ee75c3d9bda',1,'TreeReader(TString file2read, vector&lt; TString &gt; trees2read, vector&lt; TString &gt; var2read):&#160;TreeReader.cpp'],['../TreeReader_8cpp.html#aa6dacd225e785add32f06ee75c3d9bda',1,'TreeReader(TString file2read, vector&lt; TString &gt; trees2read, vector&lt; TString &gt; var2read):&#160;TreeReader.cpp']]]
+  ['treereader_28',['TreeReader',['../TreeReader_8h.html#ab3286c877bf97756f3d6b15102da4b77',1,'TreeReader(vector&lt; MarkedNames &gt; file2read, vector&lt; MarkedNames &gt; trees2read, vector&lt; MarkedNames &gt; var2read):&#160;TreeReader.cpp'],['../TreeReader_8cpp.html#ab3286c877bf97756f3d6b15102da4b77',1,'TreeReader(vector&lt; MarkedNames &gt; file2read, vector&lt; MarkedNames &gt; trees2read, vector&lt; MarkedNames &gt; var2read):&#160;TreeReader.cpp']]]
 ];

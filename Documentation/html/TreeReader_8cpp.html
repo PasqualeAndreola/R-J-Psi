@@ -79,23 +79,24 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Source file for <a class="el" href="TreeReader_8cpp.html#aa6dacd225e785add32f06ee75c3d9bda">TreeReader</a> function implementation.  
+<p>Source file for <a class="el" href="TreeReader_8cpp.html#ab3286c877bf97756f3d6b15102da4b77">TreeReader</a> function implementation.  
 <a href="#details">More...</a></p>
 
 <p><a href="TreeReader_8cpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aa6dacd225e785add32f06ee75c3d9bda"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TreeReader_8cpp.html#aa6dacd225e785add32f06ee75c3d9bda">TreeReader</a> (TString file2read, vector&lt; TString &gt; trees2read, vector&lt; TString &gt; var2read)</td></tr>
-<tr class="separator:aa6dacd225e785add32f06ee75c3d9bda"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3286c877bf97756f3d6b15102da4b77"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="TreeReader_8cpp.html#ab3286c877bf97756f3d6b15102da4b77">TreeReader</a> (vector&lt; <a class="el" href="classMarkedNames.html">MarkedNames</a> &gt; file2read, vector&lt; <a class="el" href="classMarkedNames.html">MarkedNames</a> &gt; trees2read, vector&lt; <a class="el" href="classMarkedNames.html">MarkedNames</a> &gt; var2read)</td></tr>
+<tr class="memdesc:ab3286c877bf97756f3d6b15102da4b77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function used to read selected variables stored in selected trees.  <a href="TreeReader_8cpp.html#ab3286c877bf97756f3d6b15102da4b77">More...</a><br /></td></tr>
+<tr class="separator:ab3286c877bf97756f3d6b15102da4b77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Source file for <a class="el" href="TreeReader_8cpp.html#aa6dacd225e785add32f06ee75c3d9bda">TreeReader</a> function implementation. </p>
+<div class="textblock"><p>Source file for <a class="el" href="TreeReader_8cpp.html#ab3286c877bf97756f3d6b15102da4b77">TreeReader</a> function implementation. </p>
 
 <p class="definition">Definition in file <a class="el" href="TreeReader_8cpp_source.html">TreeReader.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="aa6dacd225e785add32f06ee75c3d9bda"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa6dacd225e785add32f06ee75c3d9bda">&#9670;&nbsp;</a></span>TreeReader()</h2>
+<a id="ab3286c877bf97756f3d6b15102da4b77"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3286c877bf97756f3d6b15102da4b77">&#9670;&nbsp;</a></span>TreeReader()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -103,19 +104,19 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int TreeReader </td>
           <td>(</td>
-          <td class="paramtype">TString&#160;</td>
+          <td class="paramtype">vector&lt; <a class="el" href="classMarkedNames.html">MarkedNames</a> &gt;&#160;</td>
           <td class="paramname"><em>file2read</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">vector&lt; TString &gt;&#160;</td>
+          <td class="paramtype">vector&lt; <a class="el" href="classMarkedNames.html">MarkedNames</a> &gt;&#160;</td>
           <td class="paramname"><em>trees2read</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">vector&lt; TString &gt;&#160;</td>
+          <td class="paramtype">vector&lt; <a class="el" href="classMarkedNames.html">MarkedNames</a> &gt;&#160;</td>
           <td class="paramname"><em>var2read</em>&#160;</td>
         </tr>
         <tr>
@@ -125,6 +126,16 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Function used to read selected variables stored in selected trees. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">file2read</td><td>name of the file which stores the trees </td></tr>
+    <tr><td class="paramname">trees2read</td><td>vector of names of trees that the user wants to explore </td></tr>
+    <tr><td class="paramname">var2read</td><td>vector of names of variables that the user wants to read </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p class="definition">Definition at line <a class="el" href="TreeReader_8cpp_source.html#l00017">17</a> of file <a class="el" href="TreeReader_8cpp_source.html">TreeReader.cpp</a>.</p>
 

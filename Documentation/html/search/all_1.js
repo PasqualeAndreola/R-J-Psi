@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['ncolumns_2',['ncolumns',['../PrintFuncInfo_8cpp.html#a6bf021aaf5106c13824f3d8f61ecd5c1',1,'PrintFuncInfo.cpp']]]
+  ['geneflag_1',['geneflag',['../classMarkedNames.html#ac612256f05c171f86f4d2d77acf93178',1,'MarkedNames']]],
+  ['genename_2',['genename',['../classMarkedNames.html#a701301e6d8e0762f4c092eb9e137d380',1,'MarkedNames']]]
 ];

@@ -2,28 +2,41 @@
 \label{TreeReader_8h}\index{SourceFiles/HeaderFiles/TreeReader.h@{SourceFiles/HeaderFiles/TreeReader.h}}
 
 
-Header file for \mbox{\hyperlink{TreeReader_8cpp_aa6dacd225e785add32f06ee75c3d9bda}{Tree\+Reader}} function.  
+Header file for \mbox{\hyperlink{TreeReader_8cpp_ab3286c877bf97756f3d6b15102da4b77}{Tree\+Reader}} function.  
 
 
 \doxysubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-int \mbox{\hyperlink{TreeReader_8h_aa6dacd225e785add32f06ee75c3d9bda}{Tree\+Reader}} (T\+String file2read, vector$<$ T\+String $>$ trees2read, vector$<$ T\+String $>$ var2read)
-\end{DoxyCompactItemize}
+int \mbox{\hyperlink{TreeReader_8h_ab3286c877bf97756f3d6b15102da4b77}{Tree\+Reader}} (vector$<$ \mbox{\hyperlink{classMarkedNames}{Marked\+Names}} $>$ file2read, vector$<$ \mbox{\hyperlink{classMarkedNames}{Marked\+Names}} $>$ trees2read, vector$<$ \mbox{\hyperlink{classMarkedNames}{Marked\+Names}} $>$ var2read)
+\begin{DoxyCompactList}\small\item\em Function used to read selected variables stored in selected trees. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \doxysubsection{Detailed Description}
-Header file for \mbox{\hyperlink{TreeReader_8cpp_aa6dacd225e785add32f06ee75c3d9bda}{Tree\+Reader}} function. 
+Header file for \mbox{\hyperlink{TreeReader_8cpp_ab3286c877bf97756f3d6b15102da4b77}{Tree\+Reader}} function. 
 
 
 
 \doxysubsection{Function Documentation}
-\mbox{\Hypertarget{TreeReader_8h_aa6dacd225e785add32f06ee75c3d9bda}\label{TreeReader_8h_aa6dacd225e785add32f06ee75c3d9bda}} 
+\mbox{\Hypertarget{TreeReader_8h_ab3286c877bf97756f3d6b15102da4b77}\label{TreeReader_8h_ab3286c877bf97756f3d6b15102da4b77}} 
 \index{TreeReader.h@{TreeReader.h}!TreeReader@{TreeReader}}
 \index{TreeReader@{TreeReader}!TreeReader.h@{TreeReader.h}}
 \doxysubsubsection{\texorpdfstring{TreeReader()}{TreeReader()}}
-{\footnotesize\ttfamily int Tree\+Reader (\begin{DoxyParamCaption}\item[{T\+String}]{file2read,  }\item[{vector$<$ T\+String $>$}]{trees2read,  }\item[{vector$<$ T\+String $>$}]{var2read }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily int Tree\+Reader (\begin{DoxyParamCaption}\item[{vector$<$ \mbox{\hyperlink{classMarkedNames}{Marked\+Names}} $>$}]{file2read,  }\item[{vector$<$ \mbox{\hyperlink{classMarkedNames}{Marked\+Names}} $>$}]{trees2read,  }\item[{vector$<$ \mbox{\hyperlink{classMarkedNames}{Marked\+Names}} $>$}]{var2read }\end{DoxyParamCaption})}
 
+
+
+Function used to read selected variables stored in selected trees. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file2read} & name of the file which stores the trees \\
+\hline
+{\em trees2read} & vector of names of trees that the user wants to explore \\
+\hline
+{\em var2read} & vector of names of variables that the user wants to read \\
+\hline
+\end{DoxyParams}
 
 
 Definition at line 17 of file Tree\+Reader.\+cpp.

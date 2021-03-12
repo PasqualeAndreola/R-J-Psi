@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['printfuncinfo_3',['PrintFuncInfo',['../PrintFuncInfo_8h.html#a1d90178ce27c0748f7e07319bb752dad',1,'PrintFuncInfo(vector&lt; TString &gt; string2print):&#160;PrintFuncInfo.cpp'],['../PrintFuncInfo_8h.html#a44f3a8faac3e492f6403e652470b7db4',1,'PrintFuncInfo(std::ostream &amp;stream, vector&lt; TString &gt; string2print):&#160;PrintFuncInfo.cpp'],['../PrintFuncInfo_8cpp.html#a1d90178ce27c0748f7e07319bb752dad',1,'PrintFuncInfo(vector&lt; TString &gt; string2print):&#160;PrintFuncInfo.cpp'],['../PrintFuncInfo_8cpp.html#a361d07be03130dc65230b48fa92c191d',1,'PrintFuncInfo(std::ostream &amp;stream, vector&lt; TString &gt; string2print):&#160;PrintFuncInfo.cpp']]],
-  ['printfuncinfo_2ecpp_4',['PrintFuncInfo.cpp',['../PrintFuncInfo_8cpp.html',1,'']]],
-  ['printfuncinfo_2eh_5',['PrintFuncInfo.h',['../PrintFuncInfo_8h.html',1,'']]]
+  ['main_3',['main',['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main.cpp']]],
+  ['main_2ecpp_4',['main.cpp',['../main_8cpp.html',1,'']]],
+  ['markednames_5',['MarkedNames',['../classMarkedNames.html',1,'MarkedNames'],['../classMarkedNames.html#acf63988b0d82e65d0eeb37e84017be08',1,'MarkedNames::MarkedNames(TString rnm, int rfl)'],['../classMarkedNames.html#ab176f6f023d531d73f43873c68ecf890',1,'MarkedNames::MarkedNames(TString rnm, int rfl, TString gnm, int gfl)']]],
+  ['markednames_2eh_6',['MarkedNames.h',['../MarkedNames_8h.html',1,'']]]
 ];
