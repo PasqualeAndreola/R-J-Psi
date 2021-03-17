@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['main_2ecpp_19',['main.cpp',['../main_8cpp.html',1,'']]],
-  ['markednames_2eh_20',['MarkedNames.h',['../MarkedNames_8h.html',1,'']]]
+  ['discriminants_2eh_28',['Discriminants.h',['../Discriminants_8h.html',1,'']]]
 ];

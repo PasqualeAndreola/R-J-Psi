@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['flag_0',['flag',['../classMarkedNames.html#aecfda33f25ed2e0e589dc424cc5afbb6',1,'MarkedNames']]]
+  ['dime_0',['dime',['../classMarkedNames.html#a97108620718ff5f0a04e571f29670e07',1,'MarkedNames']]],
+  ['discriminants_2eh_1',['Discriminants.h',['../Discriminants_8h.html',1,'']]]
 ];

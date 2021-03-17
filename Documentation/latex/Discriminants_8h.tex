@@ -1,0 +1,93 @@
+\hypertarget{Discriminants_8h}{}\doxysection{Source\+Files/\+Header\+Files/\+Discriminants.h File Reference}
+\label{Discriminants_8h}\index{SourceFiles/HeaderFiles/Discriminants.h@{SourceFiles/HeaderFiles/Discriminants.h}}
+
+
+Header file for various discriminants return function.  
+
+
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+auto \mbox{\hyperlink{Discriminants_8h_a1e3206312538f2ec3a0accfc2b194fa7}{squaredtransferredmomentum}}
+\item 
+auto \mbox{\hyperlink{Discriminants_8h_a8890cf0aa8d44a9c6ecf3cba15d24b22}{missingmasssquared}}
+\item 
+auto \mbox{\hyperlink{Discriminants_8h_a62093029272b2b27d6b8c26c6daa82c2}{missingpt}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Header file for various discriminants return function. 
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{Discriminants_8h_a8890cf0aa8d44a9c6ecf3cba15d24b22}\label{Discriminants_8h_a8890cf0aa8d44a9c6ecf3cba15d24b22}} 
+\index{Discriminants.h@{Discriminants.h}!missingmasssquared@{missingmasssquared}}
+\index{missingmasssquared@{missingmasssquared}!Discriminants.h@{Discriminants.h}}
+\doxysubsubsection{\texorpdfstring{missingmasssquared}{missingmasssquared}}
+{\footnotesize\ttfamily auto missingmasssquared}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= [](Float\_t Bpt, Float\_t Beta, Float\_t Bphi, Float\_t Bmass,}
+\DoxyCodeLine{                             Float\_t mu1pt, Float\_t mu1eta, Float\_t mu1phi, Float\_t mu1mass,}
+\DoxyCodeLine{                             Float\_t mu2pt, Float\_t mu2eta, Float\_t mu2phi, Float\_t mu2mass,}
+\DoxyCodeLine{                             Float\_t kpt, Float\_t keta, Float\_t kphi, Float\_t kmass) }
+\DoxyCodeLine{\{}
+\DoxyCodeLine{    Float\_t  mm2e = Bpt*cosh(Beta)-\/mu1pt*cosh(mu1eta)-\/mu2pt*cosh(mu2eta)-\/kpt*cosh(keta);}
+\DoxyCodeLine{    Float\_t mm2px = Bpt*cos(Bphi)-\/mu1pt*cos(mu1phi)-\/mu2pt*cos(mu2phi)-\/kpt*cos(kphi);}
+\DoxyCodeLine{    Float\_t mm2py = Bpt*sin(Bphi)-\/mu1pt*sin(mu1phi)-\/mu2pt*sin(mu2phi)-\/kpt*sin(kphi);}
+\DoxyCodeLine{    Float\_t mm2pz = Bpt*sinh(Beta)-\/mu1pt*sinh(mu1eta)-\/mu2pt*sinh(mu2eta)-\/kpt*sinh(keta);}
+\DoxyCodeLine{}
+\DoxyCodeLine{    \textcolor{keywordflow}{return} (Float\_t)(mm2e*mm2e-\/mm2px*mm2px-\/mm2py*mm2py-\/mm2pz*mm2pz);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line 29 of file Discriminants.\+h.
+
+\mbox{\Hypertarget{Discriminants_8h_a62093029272b2b27d6b8c26c6daa82c2}\label{Discriminants_8h_a62093029272b2b27d6b8c26c6daa82c2}} 
+\index{Discriminants.h@{Discriminants.h}!missingpt@{missingpt}}
+\index{missingpt@{missingpt}!Discriminants.h@{Discriminants.h}}
+\doxysubsubsection{\texorpdfstring{missingpt}{missingpt}}
+{\footnotesize\ttfamily auto missingpt}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= [](Float\_t Bpt, Float\_t mu1pt, Float\_t mu2pt, Float\_t kpt)}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{    \textcolor{keywordflow}{return} (Float\_t)(Bpt-\/mu1pt-\/mu2pt-\/kpt);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line 42 of file Discriminants.\+h.
+
+\mbox{\Hypertarget{Discriminants_8h_a1e3206312538f2ec3a0accfc2b194fa7}\label{Discriminants_8h_a1e3206312538f2ec3a0accfc2b194fa7}} 
+\index{Discriminants.h@{Discriminants.h}!squaredtransferredmomentum@{squaredtransferredmomentum}}
+\index{squaredtransferredmomentum@{squaredtransferredmomentum}!Discriminants.h@{Discriminants.h}}
+\doxysubsubsection{\texorpdfstring{squaredtransferredmomentum}{squaredtransferredmomentum}}
+{\footnotesize\ttfamily auto squaredtransferredmomentum}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= [](Float\_t Bpt, Float\_t Beta, Float\_t Bphi, Float\_t Bmass,}
+\DoxyCodeLine{                                     Float\_t mu1pt, Float\_t mu1eta, Float\_t mu1phi, Float\_t mu1mass,}
+\DoxyCodeLine{                                     Float\_t mu2pt, Float\_t mu2eta, Float\_t mu2phi, Float\_t mu2mass) }
+\DoxyCodeLine{\{}
+\DoxyCodeLine{    Float\_t  q2e = Bpt*cosh(Beta)-\/mu1pt*cosh(mu1eta)-\/mu2pt*cosh(mu2eta);}
+\DoxyCodeLine{    Float\_t q2px = Bpt*cos(Bphi)-\/mu1pt*cos(mu1phi)-\/mu2pt*cos(mu2phi);}
+\DoxyCodeLine{    Float\_t q2py = Bpt*sin(Bphi)-\/mu1pt*sin(mu1phi)-\/mu2pt*sin(mu2phi);}
+\DoxyCodeLine{    Float\_t q2pz = Bpt*sinh(Beta)-\/mu1pt*sinh(mu1eta)-\/mu2pt*sinh(mu2eta);}
+\DoxyCodeLine{}
+\DoxyCodeLine{    \textcolor{keywordflow}{return} (Float\_t)(q2e*q2e-\/q2px*q2px-\/q2py*q2py-\/q2pz*q2pz);}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line 17 of file Discriminants.\+h.
+

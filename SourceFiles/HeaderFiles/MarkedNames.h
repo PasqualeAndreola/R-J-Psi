@@ -15,12 +15,16 @@ public:
     int flag;
     TString genename = "";
     int geneflag = -1;
-    MarkedNames(TString rnm, int rfl)
+    TString dime;
+    TString labeltxt;
+    MarkedNames(TString rnm, int rfl, TString measure = TString(), TString labeltext = TString())
     {
         name = rnm;
         flag = rfl;
+        dime = measure;
+        labeltxt = labeltext;
     };
-    MarkedNames(TString rnm, int rfl, TString gnm, int gfl)
+    MarkedNames(TString rnm, int rfl, TString gnm, int gfl, TString measure = TString(), TString labeltext = TString())
     {
         if (rfl == 1)
         {
@@ -28,6 +32,8 @@ public:
             flag = rfl;
             genename = gnm;
             geneflag = gfl;
+            dime = measure;
+            labeltxt = labeltext;
         }
         else if (rfl == 0)
         {
@@ -35,6 +41,8 @@ public:
             flag = gfl;
             genename = rnm;
             geneflag = rfl;
+            dime = measure;
+            labeltxt = labeltext;
         }
     };
 };

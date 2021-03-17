@@ -13,10 +13,12 @@
 #include <TTree.h>
 #include <TH1F.h>
 #include <THStack.h>
+#include <TH2F.h>
 #include <TGraph.h>
 #include <TCanvas.h>
 #include <TLegend.h>
-#include <TPaveText.h>
+#include <TLegendEntry.h>
+#include <TPaveStats.h>
 #include "MarkedNames.h"
 
 /*These namespaces can be useful*/

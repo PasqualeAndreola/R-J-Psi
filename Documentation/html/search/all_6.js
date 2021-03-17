@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['this_13',['This',['../classThis.html',1,'']]],
-  ['treereader_14',['TreeReader',['../TreeReader_8h.html#ab3286c877bf97756f3d6b15102da4b77',1,'TreeReader(vector&lt; MarkedNames &gt; file2read, vector&lt; MarkedNames &gt; trees2read, vector&lt; MarkedNames &gt; var2read):&#160;TreeReader.cpp'],['../TreeReader_8cpp.html#ab3286c877bf97756f3d6b15102da4b77',1,'TreeReader(vector&lt; MarkedNames &gt; file2read, vector&lt; MarkedNames &gt; trees2read, vector&lt; MarkedNames &gt; var2read):&#160;TreeReader.cpp']]],
-  ['treereader_2ecpp_15',['TreeReader.cpp',['../TreeReader_8cpp.html',1,'']]],
-  ['treereader_2eh_16',['TreeReader.h',['../TreeReader_8h.html',1,'']]]
+  ['printfuncinfo_14',['PrintFuncInfo',['../PrintFuncInfo_8h.html#a1d90178ce27c0748f7e07319bb752dad',1,'PrintFuncInfo(vector&lt; TString &gt; string2print):&#160;PrintFuncInfo.cpp'],['../PrintFuncInfo_8h.html#a44f3a8faac3e492f6403e652470b7db4',1,'PrintFuncInfo(std::ostream &amp;stream, vector&lt; TString &gt; string2print):&#160;PrintFuncInfo.cpp'],['../PrintFuncInfo_8cpp.html#a1d90178ce27c0748f7e07319bb752dad',1,'PrintFuncInfo(vector&lt; TString &gt; string2print):&#160;PrintFuncInfo.cpp'],['../PrintFuncInfo_8cpp.html#a361d07be03130dc65230b48fa92c191d',1,'PrintFuncInfo(std::ostream &amp;stream, vector&lt; TString &gt; string2print):&#160;PrintFuncInfo.cpp']]],
+  ['printfuncinfo_2ecpp_15',['PrintFuncInfo.cpp',['../PrintFuncInfo_8cpp.html',1,'']]],
+  ['printfuncinfo_2eh_16',['PrintFuncInfo.h',['../PrintFuncInfo_8h.html',1,'']]]
 ];

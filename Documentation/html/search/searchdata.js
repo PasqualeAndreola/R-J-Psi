@@ -1,10 +1,10 @@
 var indexSectionsWithContent =
 {
-  0: "fgmnprt",
+  0: "dfglmnprst",
   1: "mt",
-  2: "mpt",
+  2: "dmpt",
   3: "mpt",
-  4: "fgn",
+  4: "dfglmns",
   5: "r"
 };
 

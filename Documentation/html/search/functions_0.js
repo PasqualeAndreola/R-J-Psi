@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['main_25',['main',['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main.cpp']]],
-  ['markednames_26',['MarkedNames',['../classMarkedNames.html#acf63988b0d82e65d0eeb37e84017be08',1,'MarkedNames::MarkedNames(TString rnm, int rfl)'],['../classMarkedNames.html#ab176f6f023d531d73f43873c68ecf890',1,'MarkedNames::MarkedNames(TString rnm, int rfl, TString gnm, int gfl)']]]
+  ['main_37',['main',['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main.cpp']]],
+  ['markednames_38',['MarkedNames',['../classMarkedNames.html#aff955bc014d3f13cd7b761be3b562aaa',1,'MarkedNames::MarkedNames(TString rnm, int rfl, TString measure=TString(), TString labeltext=TString())'],['../classMarkedNames.html#a0e901a6b17beff37de899f4208ec9918',1,'MarkedNames::MarkedNames(TString rnm, int rfl, TString gnm, int gfl, TString measure=TString(), TString labeltext=TString())']]]
 ];

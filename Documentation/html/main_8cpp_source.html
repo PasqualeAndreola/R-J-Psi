@@ -77,81 +77,110 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <a href="main_8cpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="PrintFuncInfo_8h.html">HeaderFiles/PrintFuncInfo.h</a>&quot;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="TreeReader_8h.html">HeaderFiles/TreeReader.h</a>&quot;</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="MarkedNames_8h.html">HeaderFiles/MarkedNames.h</a>&quot;</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment">//It can be useful to use these namespaces</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">using namespace </span>std;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">   22</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> *argv[])</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;{</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="comment">// Input files and relative flags (1 for real data, 0 for MC)</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  vector&lt;MarkedNames&gt; filenames;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  filenames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;BcToJpsiMuNu_UL_2021Jan26.root&quot;</span>, 0));</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  filenames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;BcToJpsiTauNu_UL_2021Jan26.root&quot;</span>, 0));</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  filenames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;data_UL_2021Jan29.root&quot;</span>, 1));</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="comment">// Input trees to be processed (1 for real, 0 for MC)</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  vector&lt;MarkedNames&gt; treenames;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  treenames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;BTo3Mu&quot;</span>, 1));</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="comment">// Input branches to be read (1 for reco, 0 for gene)</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="comment">// Please write in a single constructor if you want a direct comparison between reco and gene</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  vector&lt;MarkedNames&gt; branchnames;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;Beta&quot;</span>, 1));</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;Bmass&quot;</span>, 1));</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;Bphi&quot;</span>, 1));</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;Bpt&quot;</span>, 0, <span class="stringliteral">&quot;Bpt_reco&quot;</span>, 1));</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;jpsi_eta&quot;</span>, 1));</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;jpsi_mass&quot;</span>, 1));</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;jpsi_phi&quot;</span>, 1));</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;jpsi_pt&quot;</span>, 1));</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu1eta&quot;</span>, 1));</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu1mass&quot;</span>, 1));</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu1phi&quot;</span>, 1));</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu1pt&quot;</span>, 1));</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu2eta&quot;</span>, 1));</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu2mass&quot;</span>, 1));</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu2phi&quot;</span>, 1));</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu2pt&quot;</span>, 1));</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="comment">// Useful Variables</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  vector&lt;TString&gt; question;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  <span class="keywordtype">string</span> answer;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  question.push_back(<span class="stringliteral">&quot;Do you wish to analyze these files? (YES/NO)&quot;</span>);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <a class="code" href="PrintFuncInfo_8h.html#a1d90178ce27c0748f7e07319bb752dad">PrintFuncInfo</a>(question);</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  question.clear();</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  cin &gt;&gt; answer;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keywordflow">if</span> (answer.compare(<span class="stringliteral">&quot;YES&quot;</span>) == 0 || answer.compare(<span class="stringliteral">&quot;yes&quot;</span>) == 0 || answer.compare(<span class="stringliteral">&quot;Yes&quot;</span>) == 0 || answer.compare(<span class="stringliteral">&quot;y&quot;</span>) == 0 || answer.compare(<span class="stringliteral">&quot;Y&quot;</span>) == 0)</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  {</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordflow">for</span> (vector&lt;MarkedNames&gt;::iterator stringit = filenames.begin(); stringit != filenames.end(); ++stringit)</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    {</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; stringit-&gt;name.Data() &lt;&lt; endl;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    }</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="Discriminants_8h.html">HeaderFiles/Discriminants.h</a>&quot;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="MarkedNames_8h.html">HeaderFiles/MarkedNames.h</a>&quot;</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="PrintFuncInfo_8h.html">HeaderFiles/PrintFuncInfo.h</a>&quot;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="TreeRDFDiscriminants_8h.html">HeaderFiles/TreeRDFDiscriminants.h</a>&quot;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="TreeReader_8h.html">HeaderFiles/TreeReader.h</a>&quot;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="comment">//It can be useful to use these namespaces</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">using namespace </span>std;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">   24</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> *argv[])</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;{</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="comment">// Input files, relative flags (1 for real data, 0 for MC) and a short name (not necessary)</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  vector&lt;MarkedNames&gt; filenames;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  filenames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;BcToJpsiMuNu_UL_2021Jan26.root&quot;</span>, 0, <span class="stringliteral">&quot;JpsiMuNu&quot;</span>));</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  filenames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;BcToJpsiTauNu_UL_2021Jan26.root&quot;</span>, 0, <span class="stringliteral">&quot;JpsiTauNu&quot;</span>));</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  filenames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;data_UL_2021Jan29.root&quot;</span>, 1, <span class="stringliteral">&quot;Data&quot;</span>));</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <span class="comment">// Input trees to be processed (1 for real, 0 for MC)</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  vector&lt;MarkedNames&gt; treenames;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  treenames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;BTo3Mu&quot;</span>, 1));</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <span class="comment">// Input branches to be read (1 for reco, 0 for gene)</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="comment">// Please write in a single constructor if you want a direct comparison between reco and gene</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  vector&lt;MarkedNames&gt; branchnames;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;Beta&quot;</span>, 1));</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;Bmass&quot;</span>, 1, <span class="stringliteral">&quot;GeV&quot;</span>));</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;Bphi&quot;</span>, 1));</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;Bpt&quot;</span>, 0, <span class="stringliteral">&quot;Bpt_reco&quot;</span>, 1, <span class="stringliteral">&quot;GeV&quot;</span>));</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;jpsi_eta&quot;</span>, 1));</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;jpsi_mass&quot;</span>, 1, <span class="stringliteral">&quot;GeV&quot;</span>));</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;jpsi_phi&quot;</span>, 1));</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;jpsi_pt&quot;</span>, 1, <span class="stringliteral">&quot;GeV&quot;</span>));</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu1eta&quot;</span>, 1));</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu1mass&quot;</span>, 1, <span class="stringliteral">&quot;GeV&quot;</span>));</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu1phi&quot;</span>, 1));</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu1pt&quot;</span>, 1, <span class="stringliteral">&quot;GeV&quot;</span>));</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu2eta&quot;</span>, 1));</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu2mass&quot;</span>, 1, <span class="stringliteral">&quot;GeV&quot;</span>));</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu2phi&quot;</span>, 1));</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;mu2pt&quot;</span>, 1, <span class="stringliteral">&quot;GeV&quot;</span>));</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;keta&quot;</span>, 1));</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;kmass&quot;</span>, 1, <span class="stringliteral">&quot;GeV&quot;</span>));</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;kphi&quot;</span>, 1));</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  branchnames.push_back(<a class="code" href="classMarkedNames.html">MarkedNames</a>(<span class="stringliteral">&quot;kpt&quot;</span>, 1, <span class="stringliteral">&quot;GeV&quot;</span>));</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  <span class="comment">// List of variables needed for each discriminant</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  unordered_map&lt;string, vector&lt;string&gt;&gt; discriminants;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="comment">// Squared transferred momentum needs four momentum of B, mu1, mu2</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  vector&lt;string&gt; Q2 = {<span class="stringliteral">&quot;Bpt&quot;</span>, <span class="stringliteral">&quot;Beta&quot;</span>, <span class="stringliteral">&quot;Bphi&quot;</span>, <span class="stringliteral">&quot;Bmass&quot;</span>,</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;                                <span class="stringliteral">&quot;mu1pt&quot;</span>, <span class="stringliteral">&quot;mu1eta&quot;</span>, <span class="stringliteral">&quot;mu1phi&quot;</span>, <span class="stringliteral">&quot;mu1mass&quot;</span>, </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                                <span class="stringliteral">&quot;mu2pt&quot;</span>, <span class="stringliteral">&quot;mu2eta&quot;</span>, <span class="stringliteral">&quot;mu2phi&quot;</span>, <span class="stringliteral">&quot;mu2mass&quot;</span>};</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  discriminants[<span class="stringliteral">&quot;Q2&quot;</span>] = Q2;</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="comment">//The user wants to analyze the files</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="TreeReader_8h.html#ab3286c877bf97756f3d6b15102da4b77">TreeReader</a>(filenames, treenames, branchnames);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  }</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  {</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    question.push_back(<span class="stringliteral">&quot;The user doesn&#39;t want to analyze those files&quot;</span>);</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <a class="code" href="PrintFuncInfo_8h.html#a1d90178ce27c0748f7e07319bb752dad">PrintFuncInfo</a>(question);</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    question.clear();</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  }</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="comment">// Missing mass squared needs four momentum of B, mu1, mu2, k(is it mu3?)</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  vector&lt;string&gt; missingm2 = {<span class="stringliteral">&quot;Bpt&quot;</span>, <span class="stringliteral">&quot;Beta&quot;</span>, <span class="stringliteral">&quot;Bphi&quot;</span>, <span class="stringliteral">&quot;Bmass&quot;</span>, </div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;                              <span class="stringliteral">&quot;mu1pt&quot;</span>, <span class="stringliteral">&quot;mu1eta&quot;</span>, <span class="stringliteral">&quot;mu1phi&quot;</span>, <span class="stringliteral">&quot;mu1mass&quot;</span>,</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;                              <span class="stringliteral">&quot;mu2pt&quot;</span>, <span class="stringliteral">&quot;mu2eta&quot;</span>, <span class="stringliteral">&quot;mu2phi&quot;</span>, <span class="stringliteral">&quot;mu2mass&quot;</span>, </div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;                              <span class="stringliteral">&quot;kpt&quot;</span>, <span class="stringliteral">&quot;keta&quot;</span>, <span class="stringliteral">&quot;kphi&quot;</span>, <span class="stringliteral">&quot;kmass&quot;</span>};</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  discriminants[<span class="stringliteral">&quot;missingm2&quot;</span>] = missingm2;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="comment">// Missing mass squared needs four momentum of B, mu1, mu2, k(is it mu3?)</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;  vector&lt;string&gt; <a class="code" href="Discriminants_8h.html#a62093029272b2b27d6b8c26c6daa82c2">missingpt</a> = {<span class="stringliteral">&quot;Bpt&quot;</span>, <span class="stringliteral">&quot;mu1pt&quot;</span>, <span class="stringliteral">&quot;mu2pt&quot;</span>, <span class="stringliteral">&quot;kpt&quot;</span>};</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;  discriminants[<span class="stringliteral">&quot;missingpt&quot;</span>] = <a class="code" href="Discriminants_8h.html#a62093029272b2b27d6b8c26c6daa82c2">missingpt</a>;</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;}</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="comment">// Useful Variables</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;  vector&lt;TString&gt; question;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keywordtype">string</span> answer;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  question.push_back(<span class="stringliteral">&quot;Do you wish to analyze these files? (YES/NO)&quot;</span>);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <a class="code" href="PrintFuncInfo_8h.html#a1d90178ce27c0748f7e07319bb752dad">PrintFuncInfo</a>(question);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  question.clear();</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  cin &gt;&gt; answer;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  <span class="keywordflow">if</span> (answer.compare(<span class="stringliteral">&quot;YES&quot;</span>) == 0 || answer.compare(<span class="stringliteral">&quot;yes&quot;</span>) == 0 || answer.compare(<span class="stringliteral">&quot;Yes&quot;</span>) == 0 || answer.compare(<span class="stringliteral">&quot;y&quot;</span>) == 0 || answer.compare(<span class="stringliteral">&quot;Y&quot;</span>) == 0)</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  {</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keywordflow">for</span> (vector&lt;MarkedNames&gt;::iterator stringit = filenames.begin(); stringit != filenames.end(); ++stringit)</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    {</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;      cout &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; stringit-&gt;name.Data() &lt;&lt; endl;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    }</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="comment">//The user wants to analyze the files</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <a class="code" href="TreeRDFDiscriminants_8h.html#a17635094e1c59564d00cc1c4f8edac30">TreeRDFDiscriminants</a>(filenames, treenames, branchnames, discriminants);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  }</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  {</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    question.push_back(<span class="stringliteral">&quot;The user doesn&#39;t want to analyze those files&quot;</span>);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <a class="code" href="PrintFuncInfo_8h.html#a1d90178ce27c0748f7e07319bb752dad">PrintFuncInfo</a>(question);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    question.clear();</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  }</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aTreeReader_8h_html_ab3286c877bf97756f3d6b15102da4b77"><div class="ttname"><a href="TreeReader_8h.html#ab3286c877bf97756f3d6b15102da4b77">TreeReader</a></div><div class="ttdeci">int TreeReader(vector&lt; MarkedNames &gt; file2read, vector&lt; MarkedNames &gt; trees2read, vector&lt; MarkedNames &gt; var2read)</div><div class="ttdoc">Function used to read selected variables stored in selected trees.</div><div class="ttdef"><b>Definition:</b> <a href="TreeReader_8cpp_source.html#l00017">TreeReader.cpp:17</a></div></div>
+<div class="ttc" id="aTreeRDFDiscriminants_8h_html_a17635094e1c59564d00cc1c4f8edac30"><div class="ttname"><a href="TreeRDFDiscriminants_8h.html#a17635094e1c59564d00cc1c4f8edac30">TreeRDFDiscriminants</a></div><div class="ttdeci">int TreeRDFDiscriminants(vector&lt; MarkedNames &gt; file2read, vector&lt; MarkedNames &gt; trees2read, vector&lt; MarkedNames &gt; var2read, unordered_map&lt; string, vector&lt; string &gt;&gt; discriminantvariables)</div><div class="ttdef"><b>Definition:</b> <a href="TreeRDFDiscriminants_8cpp_source.html#l00018">TreeRDFDiscriminants.cpp:18</a></div></div>
 <div class="ttc" id="aTreeReader_8h_html"><div class="ttname"><a href="TreeReader_8h.html">TreeReader.h</a></div><div class="ttdoc">Header file for TreeReader function.</div></div>
 <div class="ttc" id="aPrintFuncInfo_8h_html"><div class="ttname"><a href="PrintFuncInfo_8h.html">PrintFuncInfo.h</a></div><div class="ttdoc">Header file for PrintFuncInfo function.</div></div>
 <div class="ttc" id="aMarkedNames_8h_html"><div class="ttname"><a href="MarkedNames_8h.html">MarkedNames.h</a></div><div class="ttdoc">Header file for MarkedNames class.</div></div>
 <div class="ttc" id="aclassMarkedNames_html"><div class="ttname"><a href="classMarkedNames.html">MarkedNames</a></div><div class="ttdef"><b>Definition:</b> <a href="MarkedNames_8h_source.html#l00011">MarkedNames.h:11</a></div></div>
-<div class="ttc" id="amain_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00022">main.cpp:22</a></div></div>
+<div class="ttc" id="aDiscriminants_8h_html"><div class="ttname"><a href="Discriminants_8h.html">Discriminants.h</a></div><div class="ttdoc">Header file for various discriminants return function.</div></div>
+<div class="ttc" id="amain_8cpp_html_a0ddf1224851353fc92bfbff6f499fa97"><div class="ttname"><a href="main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a></div><div class="ttdeci">int main(int argc, char *argv[])</div><div class="ttdef"><b>Definition:</b> <a href="main_8cpp_source.html#l00024">main.cpp:24</a></div></div>
+<div class="ttc" id="aTreeRDFDiscriminants_8h_html"><div class="ttname"><a href="TreeRDFDiscriminants_8h.html">TreeRDFDiscriminants.h</a></div></div>
 <div class="ttc" id="aPrintFuncInfo_8h_html_a1d90178ce27c0748f7e07319bb752dad"><div class="ttname"><a href="PrintFuncInfo_8h.html#a1d90178ce27c0748f7e07319bb752dad">PrintFuncInfo</a></div><div class="ttdeci">void PrintFuncInfo(vector&lt; TString &gt; string2print)</div><div class="ttdoc">Function used to print a banner with function info.</div><div class="ttdef"><b>Definition:</b> <a href="PrintFuncInfo_8cpp_source.html#l00026">PrintFuncInfo.cpp:26</a></div></div>
+<div class="ttc" id="aDiscriminants_8h_html_a62093029272b2b27d6b8c26c6daa82c2"><div class="ttname"><a href="Discriminants_8h.html#a62093029272b2b27d6b8c26c6daa82c2">missingpt</a></div><div class="ttdeci">auto missingpt</div><div class="ttdef"><b>Definition:</b> <a href="Discriminants_8h_source.html#l00042">Discriminants.h:42</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">
