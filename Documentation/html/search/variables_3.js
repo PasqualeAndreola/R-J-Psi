@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['labeltxt_46',['labeltxt',['../classMarkedNames.html#ad56cdedc5fd042b140aa405299a5b60f',1,'MarkedNames']]]
+  ['geneflag_48',['geneflag',['../classMarkedNames.html#ac612256f05c171f86f4d2d77acf93178',1,'MarkedNames']]],
+  ['genename_49',['genename',['../classMarkedNames.html#a701301e6d8e0762f4c092eb9e137d380',1,'MarkedNames']]]
 ];

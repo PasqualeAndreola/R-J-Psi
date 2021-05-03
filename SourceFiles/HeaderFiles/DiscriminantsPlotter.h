@@ -1,10 +1,10 @@
 /*! 
- *  \file TreeReader.h 
- *  \brief Header file for \ref TreeReader function
+ *  \file DiscriminantsPlotter.h 
+ *  \brief Header file for \ref DiscriminantsPlotter function
  */
 
-#ifndef TREEREADER_H
-#define TREEREADER_H
+#ifndef DISCRIMINANTSPLOTTER_H
+#define DISCRIMINANTSPLOTTER_H
 
 #include <iostream>
 #include <vector>
@@ -23,15 +23,18 @@
 #include <TLegendEntry.h>
 #include <TPaveStats.h>
 #include "MarkedNames.h"
+#include <TLorentzVector.h>
+#include "VarToBePlotted.h"
+#include <TColor.h>
+#include <TStyle.h>
+#include <TGraphErrors.h>
 
 /*These namespaces can be useful*/
 using namespace std;
 
-int TreeRDFDiscriminants(vector<MarkedNames> file2read, 
+int DiscriminantsPlotter(vector<MarkedNames> file2read, 
                          vector<MarkedNames> trees2read, 
-                         vector<MarkedNames> var2read, 
-                         unordered_map<string, vector<string>> discriminantvariables,
-                         string filter,
-                         bool debugflag = false);
+                         vector<VarToBePlotted> vartobeplotted,
+                         bool debug = false);
 
 #endif

@@ -10,6 +10,9 @@ BUILDDIR  := BuildFiles
 TARGETDIR := BinFiles
 INPUTDIR  := InputFiles
 OUTPUTDIR := OutputFiles
+OUTPUTDIR += OutputFiles/PNGPlots
+OUTPUTDIR += OutputFiles/PNGPlots/Angles
+OUTPUTDIR += OutputFiles/PNGPlots/Discriminants
 
 #Source and build file extension
 SRCEXT := cpp
@@ -32,7 +35,8 @@ SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.$(OBJEXT)))	
 
 #Default make execution
-all: directories doxy $(TARGET)
+all: directories $(TARGET)
+	 @./BinFiles/Analysis
 
 #Remake
 remake: cleaner all

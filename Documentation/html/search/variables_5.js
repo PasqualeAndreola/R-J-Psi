@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['name_49',['name',['../classMarkedNames.html#a544089128a5d5b2e1cfc5cac2541f71c',1,'MarkedNames']]],
-  ['ncolumns_50',['ncolumns',['../PrintFuncInfo_8cpp.html#a6bf021aaf5106c13824f3d8f61ecd5c1',1,'PrintFuncInfo.cpp']]]
+  ['missingmasssquared_51',['missingmasssquared',['../Discriminants_8h.html#a8890cf0aa8d44a9c6ecf3cba15d24b22',1,'Discriminants.h']]],
+  ['missingpt_52',['missingpt',['../Discriminants_8h.html#a62093029272b2b27d6b8c26c6daa82c2',1,'Discriminants.h']]]
 ];

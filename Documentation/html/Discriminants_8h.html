@@ -79,25 +79,58 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Header file for various discriminants return function.  
+<p>Header file for some variables calculated with lambda function.  
 <a href="#details">More...</a></p>
 
 <p><a href="Discriminants_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a7663107378c10268e5f44179452503cd"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Discriminants_8h.html#a7663107378c10268e5f44179452503cd">eta</a></td></tr>
+<tr class="separator:a7663107378c10268e5f44179452503cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00a16ca02362c1838716c68d5c55623f"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Discriminants_8h.html#a00a16ca02362c1838716c68d5c55623f">Phi</a></td></tr>
+<tr class="separator:a00a16ca02362c1838716c68d5c55623f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e3206312538f2ec3a0accfc2b194fa7"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Discriminants_8h.html#a1e3206312538f2ec3a0accfc2b194fa7">squaredtransferredmomentum</a></td></tr>
 <tr class="separator:a1e3206312538f2ec3a0accfc2b194fa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7e55a9aba59e7b89b1cf24ea3a3e907"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Discriminants_8h.html#ac7e55a9aba59e7b89b1cf24ea3a3e907">squaredtransferredmomentumvertex</a></td></tr>
+<tr class="separator:ac7e55a9aba59e7b89b1cf24ea3a3e907"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8890cf0aa8d44a9c6ecf3cba15d24b22"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Discriminants_8h.html#a8890cf0aa8d44a9c6ecf3cba15d24b22">missingmasssquared</a></td></tr>
 <tr class="separator:a8890cf0aa8d44a9c6ecf3cba15d24b22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62093029272b2b27d6b8c26c6daa82c2"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Discriminants_8h.html#a62093029272b2b27d6b8c26c6daa82c2">missingpt</a></td></tr>
 <tr class="separator:a62093029272b2b27d6b8c26c6daa82c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Header file for various discriminants return function. </p>
+<div class="textblock"><p>Header file for some variables calculated with lambda function. </p>
 
 <p class="definition">Definition in file <a class="el" href="Discriminants_8h_source.html">Discriminants.h</a>.</p>
 </div><h2 class="groupheader">Variable Documentation</h2>
+<a id="a7663107378c10268e5f44179452503cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7663107378c10268e5f44179452503cd">&#9670;&nbsp;</a></span>eta</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto eta</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= [](Float_t vertex1x, Float_t vertex1y, Float_t vertex1z,</div>
+<div class="line">              Float_t vertex2x, Float_t vertex2y, Float_t vertex2z)</div>
+<div class="line">{</div>
+<div class="line">  Float_t vertexversorx = vertex1x - vertex2x,</div>
+<div class="line">          vertexversory = vertex1y - vertex2y,</div>
+<div class="line">          vertexversorz = vertex1z - vertex2z;</div>
+<div class="line">  </div>
+<div class="line">  TVector3 versor = TVector3(vertexversorx, vertexversory, vertexversorz);</div>
+<div class="line"> </div>
+<div class="line">  <span class="keywordflow">return</span> versor.Eta();</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="Discriminants_8h_source.html#l00017">17</a> of file <a class="el" href="Discriminants_8h_source.html">Discriminants.h</a>.</p>
+
+</div>
+</div>
 <a id="a8890cf0aa8d44a9c6ecf3cba15d24b22"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8890cf0aa8d44a9c6ecf3cba15d24b22">&#9670;&nbsp;</a></span>missingmasssquared</h2>
 
@@ -114,15 +147,23 @@ Variables</h2></td></tr>
 <div class="line">                             Float_t mu2pt, Float_t mu2eta, Float_t mu2phi, Float_t mu2mass,</div>
 <div class="line">                             Float_t kpt, Float_t keta, Float_t kphi, Float_t kmass) </div>
 <div class="line">{</div>
-<div class="line">    Float_t  mm2e = Bpt*cosh(Beta)-mu1pt*cosh(mu1eta)-mu2pt*cosh(mu2eta)-kpt*cosh(keta);</div>
-<div class="line">    Float_t mm2px = Bpt*cos(Bphi)-mu1pt*cos(mu1phi)-mu2pt*cos(mu2phi)-kpt*cos(kphi);</div>
-<div class="line">    Float_t mm2py = Bpt*sin(Bphi)-mu1pt*sin(mu1phi)-mu2pt*sin(mu2phi)-kpt*sin(kphi);</div>
-<div class="line">    Float_t mm2pz = Bpt*sinh(Beta)-mu1pt*sinh(mu1eta)-mu2pt*sinh(mu2eta)-kpt*sinh(keta);</div>
+<div class="line">    Float_t Bc_MASS = 6.341;</div>
+<div class="line"> </div>
+<div class="line">    Float_t   BPt = Bpt*(Bc_MASS/Bmass),</div>
+<div class="line">              Bp2 = pow(BPt*cosh(Beta),2),</div>
+<div class="line">            mu1p2 = pow(mu1pt*cosh(mu1eta),2),</div>
+<div class="line">            mu2p2 = pow(mu2pt*cosh(mu2eta),2),</div>
+<div class="line">              kp2 = pow(kpt*cosh(keta),2);</div>
+<div class="line"> </div>
+<div class="line">    Float_t  mm2e = sqrt(Bp2+Bc_MASS*Bc_MASS)-sqrt(mu1p2+mu1mass*mu1mass)-sqrt(mu2p2+mu2mass*mu2mass)-sqrt(kp2+kmass*kmass),</div>
+<div class="line">            mm2px = BPt*cos(Bphi)-mu1pt*cos(mu1phi)-mu2pt*cos(mu2phi)-kpt*cos(kphi),</div>
+<div class="line">            mm2py = BPt*sin(Bphi)-mu1pt*sin(mu1phi)-mu2pt*sin(mu2phi)-kpt*sin(kphi),</div>
+<div class="line">            mm2pz = BPt*sinh(Beta)-mu1pt*sinh(mu1eta)-mu2pt*sinh(mu2eta)-kpt*sinh(keta);</div>
 <div class="line"> </div>
 <div class="line">    <span class="keywordflow">return</span> (Float_t)(mm2e*mm2e-mm2px*mm2px-mm2py*mm2py-mm2pz*mm2pz);</div>
 <div class="line">}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Discriminants_8h_source.html#l00029">29</a> of file <a class="el" href="Discriminants_8h_source.html">Discriminants.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Discriminants_8h_source.html#l00081">81</a> of file <a class="el" href="Discriminants_8h_source.html">Discriminants.h</a>.</p>
 
 </div>
 </div>
@@ -137,12 +178,43 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= [](Float_t Bpt, Float_t mu1pt, Float_t mu2pt, Float_t kpt)</div>
+<b>Initial value:</b><div class="fragment"><div class="line">= [](Float_t Bpt, Float_t Bmass, Float_t mu1pt, Float_t mu2pt, Float_t kpt)</div>
 <div class="line">{</div>
-<div class="line">    <span class="keywordflow">return</span> (Float_t)(Bpt-mu1pt-mu2pt-kpt);</div>
+<div class="line">    Float_t Bc_MASS = 6.341;</div>
+<div class="line"> </div>
+<div class="line">    Float_t BPt = Bpt*(Bc_MASS/Bmass);</div>
+<div class="line">    </div>
+<div class="line">    <span class="keywordflow">return</span> (Float_t)(BPt-mu1pt-mu2pt-kpt);</div>
 <div class="line">}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Discriminants_8h_source.html#l00042">42</a> of file <a class="el" href="Discriminants_8h_source.html">Discriminants.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Discriminants_8h_source.html#l00102">102</a> of file <a class="el" href="Discriminants_8h_source.html">Discriminants.h</a>.</p>
+
+</div>
+</div>
+<a id="a00a16ca02362c1838716c68d5c55623f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00a16ca02362c1838716c68d5c55623f">&#9670;&nbsp;</a></span>Phi</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto Phi</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= [](Float_t vertex1x, Float_t vertex1y, Float_t vertex1z,</div>
+<div class="line">              Float_t vertex2x, Float_t vertex2y, Float_t vertex2z)</div>
+<div class="line">{</div>
+<div class="line">  Float_t vertexversorx = vertex1x - vertex2x,</div>
+<div class="line">          vertexversory = vertex1y - vertex2y,</div>
+<div class="line">          vertexversorz = vertex1z - vertex2z;</div>
+<div class="line">  </div>
+<div class="line">  TVector3 versor = TVector3(vertexversorx, vertexversory, vertexversorz);</div>
+<div class="line"> </div>
+<div class="line">  <span class="keywordflow">return</span> versor.Phi();</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="Discriminants_8h_source.html#l00029">29</a> of file <a class="el" href="Discriminants_8h_source.html">Discriminants.h</a>.</p>
 
 </div>
 </div>
@@ -161,15 +233,58 @@ Variables</h2></td></tr>
 <div class="line">                                     Float_t mu1pt, Float_t mu1eta, Float_t mu1phi, Float_t mu1mass,</div>
 <div class="line">                                     Float_t mu2pt, Float_t mu2eta, Float_t mu2phi, Float_t mu2mass) </div>
 <div class="line">{</div>
-<div class="line">    Float_t  q2e = Bpt*cosh(Beta)-mu1pt*cosh(mu1eta)-mu2pt*cosh(mu2eta);</div>
-<div class="line">    Float_t q2px = Bpt*cos(Bphi)-mu1pt*cos(mu1phi)-mu2pt*cos(mu2phi);</div>
-<div class="line">    Float_t q2py = Bpt*sin(Bphi)-mu1pt*sin(mu1phi)-mu2pt*sin(mu2phi);</div>
-<div class="line">    Float_t q2pz = Bpt*sinh(Beta)-mu1pt*sinh(mu1eta)-mu2pt*sinh(mu2eta);</div>
+<div class="line">    Float_t Bc_MASS = 6.2749;</div>
 <div class="line"> </div>
-<div class="line">    <span class="keywordflow">return</span> (Float_t)(q2e*q2e-q2px*q2px-q2py*q2py-q2pz*q2pz);</div>
+<div class="line">    Float_t   BPt = Bpt*(Bc_MASS/Bmass);</div>
+<div class="line">    </div>
+<div class="line">    TLorentzVector pmu_B, pmu_mu1, pmu_mu2;</div>
+<div class="line">    pmu_B.SetPtEtaPhiM(BPt, Beta, Bphi, Bc_MASS);</div>
+<div class="line">    pmu_mu1.SetPtEtaPhiM(mu1pt, mu1eta, mu1phi, mu1mass);</div>
+<div class="line">    pmu_mu2.SetPtEtaPhiM(mu2pt, mu2eta, mu2phi, mu2mass); </div>
+<div class="line"> </div>
+<div class="line">    <span class="keywordflow">return</span> (Float_t)(pmu_B-pmu_mu1-pmu_mu2).Mag2();</div>
 <div class="line">}</div>
 </div><!-- fragment -->
-<p class="definition">Definition at line <a class="el" href="Discriminants_8h_source.html#l00017">17</a> of file <a class="el" href="Discriminants_8h_source.html">Discriminants.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Discriminants_8h_source.html#l00041">41</a> of file <a class="el" href="Discriminants_8h_source.html">Discriminants.h</a>.</p>
+
+</div>
+</div>
+<a id="ac7e55a9aba59e7b89b1cf24ea3a3e907"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7e55a9aba59e7b89b1cf24ea3a3e907">&#9670;&nbsp;</a></span>squaredtransferredmomentumvertex</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto squaredtransferredmomentumvertex</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= [](Float_t Bpt, Float_t Beta, Float_t Bphi, Float_t Bmass,</div>
+<div class="line">                                     Float_t mu1pt, Float_t mu1eta, Float_t mu1phi, Float_t mu1mass,</div>
+<div class="line">                                     Float_t mu2pt, Float_t mu2eta, Float_t mu2phi, Float_t mu2mass,</div>
+<div class="line">                                     Float_t Bvx, Float_t Bvy, Float_t Bvz,</div>
+<div class="line">                                     Float_t Jpsivx, Float_t Jpsivy, Float_t Jpsivz) </div>
+<div class="line">{</div>
+<div class="line">    Float_t Bc_MASS = 6.341;</div>
+<div class="line"> </div>
+<div class="line">    Float_t       versorx = Jpsivx - Bvx,</div>
+<div class="line">                  versory = Jpsivy - Bvy,</div>
+<div class="line">                  versorz = Jpsivz - Bvz;</div>
+<div class="line"> </div>
+<div class="line">    TVector3 vertex = TVector3(versorx, versory, versorz);</div>
+<div class="line">                </div>
+<div class="line">    Float_t   BPt = Bpt*(Bc_MASS/Bmass);</div>
+<div class="line"> </div>
+<div class="line">    TLorentzVector pmu_vertex, pmu_mu1, pmu_mu2;</div>
+<div class="line">    pmu_vertex.SetPtEtaPhiM(BPt, vertex.Eta(), vertex.Phi(), Bc_MASS);</div>
+<div class="line">    pmu_mu1.SetPtEtaPhiM(mu1pt, mu1eta, mu1phi, mu1mass);</div>
+<div class="line">    pmu_mu2.SetPtEtaPhiM(mu2pt, mu2eta, mu2phi, mu2mass); </div>
+<div class="line"> </div>
+<div class="line">    <span class="keywordflow">return</span> (Float_t)(pmu_vertex-pmu_mu1-pmu_mu2).Mag2();</div>
+<div class="line">}</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="Discriminants_8h_source.html#l00057">57</a> of file <a class="el" href="Discriminants_8h_source.html">Discriminants.h</a>.</p>
 
 </div>
 </div>

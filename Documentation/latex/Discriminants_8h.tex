@@ -2,13 +2,19 @@
 \label{Discriminants_8h}\index{SourceFiles/HeaderFiles/Discriminants.h@{SourceFiles/HeaderFiles/Discriminants.h}}
 
 
-Header file for various discriminants return function.  
+Header file for some variables calculated with lambda function.  
 
 
 \doxysubsection*{Variables}
 \begin{DoxyCompactItemize}
 \item 
+auto \mbox{\hyperlink{Discriminants_8h_a7663107378c10268e5f44179452503cd}{eta}}
+\item 
+auto \mbox{\hyperlink{Discriminants_8h_a00a16ca02362c1838716c68d5c55623f}{Phi}}
+\item 
 auto \mbox{\hyperlink{Discriminants_8h_a1e3206312538f2ec3a0accfc2b194fa7}{squaredtransferredmomentum}}
+\item 
+auto \mbox{\hyperlink{Discriminants_8h_ac7e55a9aba59e7b89b1cf24ea3a3e907}{squaredtransferredmomentumvertex}}
 \item 
 auto \mbox{\hyperlink{Discriminants_8h_a8890cf0aa8d44a9c6ecf3cba15d24b22}{missingmasssquared}}
 \item 
@@ -17,11 +23,36 @@ auto \mbox{\hyperlink{Discriminants_8h_a62093029272b2b27d6b8c26c6daa82c2}{missin
 
 
 \doxysubsection{Detailed Description}
-Header file for various discriminants return function. 
+Header file for some variables calculated with lambda function. 
 
 
 
 \doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{Discriminants_8h_a7663107378c10268e5f44179452503cd}\label{Discriminants_8h_a7663107378c10268e5f44179452503cd}} 
+\index{Discriminants.h@{Discriminants.h}!eta@{eta}}
+\index{eta@{eta}!Discriminants.h@{Discriminants.h}}
+\doxysubsubsection{\texorpdfstring{eta}{eta}}
+{\footnotesize\ttfamily auto eta}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= [](Float\_t vertex1x, Float\_t vertex1y, Float\_t vertex1z,}
+\DoxyCodeLine{              Float\_t vertex2x, Float\_t vertex2y, Float\_t vertex2z)}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{  Float\_t vertexversorx = vertex1x -\/ vertex2x,}
+\DoxyCodeLine{          vertexversory = vertex1y -\/ vertex2y,}
+\DoxyCodeLine{          vertexversorz = vertex1z -\/ vertex2z;}
+\DoxyCodeLine{  }
+\DoxyCodeLine{  TVector3 versor = TVector3(vertexversorx, vertexversory, vertexversorz);}
+\DoxyCodeLine{}
+\DoxyCodeLine{  \textcolor{keywordflow}{return} versor.Eta();}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line 17 of file Discriminants.\+h.
+
 \mbox{\Hypertarget{Discriminants_8h_a8890cf0aa8d44a9c6ecf3cba15d24b22}\label{Discriminants_8h_a8890cf0aa8d44a9c6ecf3cba15d24b22}} 
 \index{Discriminants.h@{Discriminants.h}!missingmasssquared@{missingmasssquared}}
 \index{missingmasssquared@{missingmasssquared}!Discriminants.h@{Discriminants.h}}
@@ -35,10 +66,18 @@ Header file for various discriminants return function.
 \DoxyCodeLine{                             Float\_t mu2pt, Float\_t mu2eta, Float\_t mu2phi, Float\_t mu2mass,}
 \DoxyCodeLine{                             Float\_t kpt, Float\_t keta, Float\_t kphi, Float\_t kmass) }
 \DoxyCodeLine{\{}
-\DoxyCodeLine{    Float\_t  mm2e = Bpt*cosh(Beta)-\/mu1pt*cosh(mu1eta)-\/mu2pt*cosh(mu2eta)-\/kpt*cosh(keta);}
-\DoxyCodeLine{    Float\_t mm2px = Bpt*cos(Bphi)-\/mu1pt*cos(mu1phi)-\/mu2pt*cos(mu2phi)-\/kpt*cos(kphi);}
-\DoxyCodeLine{    Float\_t mm2py = Bpt*sin(Bphi)-\/mu1pt*sin(mu1phi)-\/mu2pt*sin(mu2phi)-\/kpt*sin(kphi);}
-\DoxyCodeLine{    Float\_t mm2pz = Bpt*sinh(Beta)-\/mu1pt*sinh(mu1eta)-\/mu2pt*sinh(mu2eta)-\/kpt*sinh(keta);}
+\DoxyCodeLine{    Float\_t Bc\_MASS = 6.341;}
+\DoxyCodeLine{}
+\DoxyCodeLine{    Float\_t   BPt = Bpt*(Bc\_MASS/Bmass),}
+\DoxyCodeLine{              Bp2 = pow(BPt*cosh(Beta),2),}
+\DoxyCodeLine{            mu1p2 = pow(mu1pt*cosh(mu1eta),2),}
+\DoxyCodeLine{            mu2p2 = pow(mu2pt*cosh(mu2eta),2),}
+\DoxyCodeLine{              kp2 = pow(kpt*cosh(keta),2);}
+\DoxyCodeLine{}
+\DoxyCodeLine{    Float\_t  mm2e = sqrt(Bp2+Bc\_MASS*Bc\_MASS)-\/sqrt(mu1p2+mu1mass*mu1mass)-\/sqrt(mu2p2+mu2mass*mu2mass)-\/sqrt(kp2+kmass*kmass),}
+\DoxyCodeLine{            mm2px = BPt*cos(Bphi)-\/mu1pt*cos(mu1phi)-\/mu2pt*cos(mu2phi)-\/kpt*cos(kphi),}
+\DoxyCodeLine{            mm2py = BPt*sin(Bphi)-\/mu1pt*sin(mu1phi)-\/mu2pt*sin(mu2phi)-\/kpt*sin(kphi),}
+\DoxyCodeLine{            mm2pz = BPt*sinh(Beta)-\/mu1pt*sinh(mu1eta)-\/mu2pt*sinh(mu2eta)-\/kpt*sinh(keta);}
 \DoxyCodeLine{}
 \DoxyCodeLine{    \textcolor{keywordflow}{return} (Float\_t)(mm2e*mm2e-\/mm2px*mm2px-\/mm2py*mm2py-\/mm2pz*mm2pz);}
 \DoxyCodeLine{\}}
@@ -46,7 +85,7 @@ Header file for various discriminants return function.
 \end{DoxyCode}
 
 
-Definition at line 29 of file Discriminants.\+h.
+Definition at line 81 of file Discriminants.\+h.
 
 \mbox{\Hypertarget{Discriminants_8h_a62093029272b2b27d6b8c26c6daa82c2}\label{Discriminants_8h_a62093029272b2b27d6b8c26c6daa82c2}} 
 \index{Discriminants.h@{Discriminants.h}!missingpt@{missingpt}}
@@ -56,15 +95,44 @@ Definition at line 29 of file Discriminants.\+h.
 
 {\bfseries Initial value\+:}
 \begin{DoxyCode}{0}
-\DoxyCodeLine{= [](Float\_t Bpt, Float\_t mu1pt, Float\_t mu2pt, Float\_t kpt)}
+\DoxyCodeLine{= [](Float\_t Bpt, Float\_t Bmass, Float\_t mu1pt, Float\_t mu2pt, Float\_t kpt)}
 \DoxyCodeLine{\{}
-\DoxyCodeLine{    \textcolor{keywordflow}{return} (Float\_t)(Bpt-\/mu1pt-\/mu2pt-\/kpt);}
+\DoxyCodeLine{    Float\_t Bc\_MASS = 6.341;}
+\DoxyCodeLine{}
+\DoxyCodeLine{    Float\_t BPt = Bpt*(Bc\_MASS/Bmass);}
+\DoxyCodeLine{    }
+\DoxyCodeLine{    \textcolor{keywordflow}{return} (Float\_t)(BPt-\/mu1pt-\/mu2pt-\/kpt);}
 \DoxyCodeLine{\}}
 
 \end{DoxyCode}
 
 
-Definition at line 42 of file Discriminants.\+h.
+Definition at line 102 of file Discriminants.\+h.
+
+\mbox{\Hypertarget{Discriminants_8h_a00a16ca02362c1838716c68d5c55623f}\label{Discriminants_8h_a00a16ca02362c1838716c68d5c55623f}} 
+\index{Discriminants.h@{Discriminants.h}!Phi@{Phi}}
+\index{Phi@{Phi}!Discriminants.h@{Discriminants.h}}
+\doxysubsubsection{\texorpdfstring{Phi}{Phi}}
+{\footnotesize\ttfamily auto Phi}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= [](Float\_t vertex1x, Float\_t vertex1y, Float\_t vertex1z,}
+\DoxyCodeLine{              Float\_t vertex2x, Float\_t vertex2y, Float\_t vertex2z)}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{  Float\_t vertexversorx = vertex1x -\/ vertex2x,}
+\DoxyCodeLine{          vertexversory = vertex1y -\/ vertex2y,}
+\DoxyCodeLine{          vertexversorz = vertex1z -\/ vertex2z;}
+\DoxyCodeLine{  }
+\DoxyCodeLine{  TVector3 versor = TVector3(vertexversorx, vertexversory, vertexversorz);}
+\DoxyCodeLine{}
+\DoxyCodeLine{  \textcolor{keywordflow}{return} versor.Phi();}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line 29 of file Discriminants.\+h.
 
 \mbox{\Hypertarget{Discriminants_8h_a1e3206312538f2ec3a0accfc2b194fa7}\label{Discriminants_8h_a1e3206312538f2ec3a0accfc2b194fa7}} 
 \index{Discriminants.h@{Discriminants.h}!squaredtransferredmomentum@{squaredtransferredmomentum}}
@@ -78,16 +146,57 @@ Definition at line 42 of file Discriminants.\+h.
 \DoxyCodeLine{                                     Float\_t mu1pt, Float\_t mu1eta, Float\_t mu1phi, Float\_t mu1mass,}
 \DoxyCodeLine{                                     Float\_t mu2pt, Float\_t mu2eta, Float\_t mu2phi, Float\_t mu2mass) }
 \DoxyCodeLine{\{}
-\DoxyCodeLine{    Float\_t  q2e = Bpt*cosh(Beta)-\/mu1pt*cosh(mu1eta)-\/mu2pt*cosh(mu2eta);}
-\DoxyCodeLine{    Float\_t q2px = Bpt*cos(Bphi)-\/mu1pt*cos(mu1phi)-\/mu2pt*cos(mu2phi);}
-\DoxyCodeLine{    Float\_t q2py = Bpt*sin(Bphi)-\/mu1pt*sin(mu1phi)-\/mu2pt*sin(mu2phi);}
-\DoxyCodeLine{    Float\_t q2pz = Bpt*sinh(Beta)-\/mu1pt*sinh(mu1eta)-\/mu2pt*sinh(mu2eta);}
+\DoxyCodeLine{    Float\_t Bc\_MASS = 6.2749;}
 \DoxyCodeLine{}
-\DoxyCodeLine{    \textcolor{keywordflow}{return} (Float\_t)(q2e*q2e-\/q2px*q2px-\/q2py*q2py-\/q2pz*q2pz);}
+\DoxyCodeLine{    Float\_t   BPt = Bpt*(Bc\_MASS/Bmass);}
+\DoxyCodeLine{    }
+\DoxyCodeLine{    TLorentzVector pmu\_B, pmu\_mu1, pmu\_mu2;}
+\DoxyCodeLine{    pmu\_B.SetPtEtaPhiM(BPt, Beta, Bphi, Bc\_MASS);}
+\DoxyCodeLine{    pmu\_mu1.SetPtEtaPhiM(mu1pt, mu1eta, mu1phi, mu1mass);}
+\DoxyCodeLine{    pmu\_mu2.SetPtEtaPhiM(mu2pt, mu2eta, mu2phi, mu2mass); }
+\DoxyCodeLine{}
+\DoxyCodeLine{    \textcolor{keywordflow}{return} (Float\_t)(pmu\_B-\/pmu\_mu1-\/pmu\_mu2).Mag2();}
 \DoxyCodeLine{\}}
 
 \end{DoxyCode}
 
 
-Definition at line 17 of file Discriminants.\+h.
+Definition at line 41 of file Discriminants.\+h.
+
+\mbox{\Hypertarget{Discriminants_8h_ac7e55a9aba59e7b89b1cf24ea3a3e907}\label{Discriminants_8h_ac7e55a9aba59e7b89b1cf24ea3a3e907}} 
+\index{Discriminants.h@{Discriminants.h}!squaredtransferredmomentumvertex@{squaredtransferredmomentumvertex}}
+\index{squaredtransferredmomentumvertex@{squaredtransferredmomentumvertex}!Discriminants.h@{Discriminants.h}}
+\doxysubsubsection{\texorpdfstring{squaredtransferredmomentumvertex}{squaredtransferredmomentumvertex}}
+{\footnotesize\ttfamily auto squaredtransferredmomentumvertex}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{= [](Float\_t Bpt, Float\_t Beta, Float\_t Bphi, Float\_t Bmass,}
+\DoxyCodeLine{                                     Float\_t mu1pt, Float\_t mu1eta, Float\_t mu1phi, Float\_t mu1mass,}
+\DoxyCodeLine{                                     Float\_t mu2pt, Float\_t mu2eta, Float\_t mu2phi, Float\_t mu2mass,}
+\DoxyCodeLine{                                     Float\_t Bvx, Float\_t Bvy, Float\_t Bvz,}
+\DoxyCodeLine{                                     Float\_t Jpsivx, Float\_t Jpsivy, Float\_t Jpsivz) }
+\DoxyCodeLine{\{}
+\DoxyCodeLine{    Float\_t Bc\_MASS = 6.341;}
+\DoxyCodeLine{}
+\DoxyCodeLine{    Float\_t       versorx = Jpsivx -\/ Bvx,}
+\DoxyCodeLine{                  versory = Jpsivy -\/ Bvy,}
+\DoxyCodeLine{                  versorz = Jpsivz -\/ Bvz;}
+\DoxyCodeLine{}
+\DoxyCodeLine{    TVector3 vertex = TVector3(versorx, versory, versorz);}
+\DoxyCodeLine{                }
+\DoxyCodeLine{    Float\_t   BPt = Bpt*(Bc\_MASS/Bmass);}
+\DoxyCodeLine{}
+\DoxyCodeLine{    TLorentzVector pmu\_vertex, pmu\_mu1, pmu\_mu2;}
+\DoxyCodeLine{    pmu\_vertex.SetPtEtaPhiM(BPt, vertex.Eta(), vertex.Phi(), Bc\_MASS);}
+\DoxyCodeLine{    pmu\_mu1.SetPtEtaPhiM(mu1pt, mu1eta, mu1phi, mu1mass);}
+\DoxyCodeLine{    pmu\_mu2.SetPtEtaPhiM(mu2pt, mu2eta, mu2phi, mu2mass); }
+\DoxyCodeLine{}
+\DoxyCodeLine{    \textcolor{keywordflow}{return} (Float\_t)(pmu\_vertex-\/pmu\_mu1-\/pmu\_mu2).Mag2();}
+\DoxyCodeLine{\}}
+
+\end{DoxyCode}
+
+
+Definition at line 57 of file Discriminants.\+h.
 

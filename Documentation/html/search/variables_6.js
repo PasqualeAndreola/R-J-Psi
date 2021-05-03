@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['squaredtransferredmomentum_51',['squaredtransferredmomentum',['../Discriminants_8h.html#a1e3206312538f2ec3a0accfc2b194fa7',1,'Discriminants.h']]]
+  ['name_53',['name',['../classMarkedNames.html#a544089128a5d5b2e1cfc5cac2541f71c',1,'MarkedNames']]],
+  ['ncolumns_54',['ncolumns',['../PrintFuncInfo_8cpp.html#a6bf021aaf5106c13824f3d8f61ecd5c1',1,'PrintFuncInfo.cpp']]]
 ];
