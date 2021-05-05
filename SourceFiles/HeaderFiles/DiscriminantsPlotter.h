@@ -28,6 +28,7 @@
 #include <TColor.h>
 #include <TStyle.h>
 #include <TGraphErrors.h>
+#include <TFrame.h>
 
 /*These namespaces can be useful*/
 using namespace std;

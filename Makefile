@@ -13,6 +13,7 @@ OUTPUTDIR := OutputFiles
 OUTPUTDIR += OutputFiles/PNGPlots
 OUTPUTDIR += OutputFiles/PNGPlots/Angles
 OUTPUTDIR += OutputFiles/PNGPlots/Discriminants
+OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies
 
 #Source and build file extension
 SRCEXT := cpp
