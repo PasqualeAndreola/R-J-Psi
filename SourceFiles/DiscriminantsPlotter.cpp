@@ -15,10 +15,18 @@
 
 int DiscriminantsPlotter(vector<MarkedNames> file2read,
                          vector<MarkedNames> trees2read,
-                         vector<VarToBePlotted> vartobeplotted,
+                         vector<const char *> *var2bestored,
+                         vector<VarToBePlotted> *vartobeplotted,
                          bool debug) 
 
 {
+    //Enabling multi-threading
+    if (debug==false) ROOT::EnableImplicitMT();
+
+    //Removing old output file
+    TFile output("ManipulatedVariables.root","recreate");
+    output.Close();
+
     //Defining histograms
     ROOT::RDF::RResultPtr<TH1F> histang;
 
@@ -40,36 +48,57 @@ int DiscriminantsPlotter(vector<MarkedNames> file2read,
             auto b2munode = std::make_unique<ROOT::RDF::RNode>(BtoMu);
 
             //Looping on variables that the user wants to plot and to be stored
-            vector<VarToBePlotted>::iterator plotvar = vartobeplotted.begin();
             vector<string> vartobestored;
-            while (plotvar != vartobeplotted.end())
+            vector<VarToBePlotted>::iterator plotvar = vartobeplotted->begin();
+            while (plotvar != vartobeplotted->end())
             {
-                // Defining a column with the computed variables
+                // Defining a column with the required variable
                 if (BtoMu.HasColumn(plotvar->varname) == false)
                     b2munode = std::make_unique<ROOT::RDF::RNode>(b2munode->Define(plotvar->varname, plotvar->varexpression));
                 vartobestored.push_back(plotvar->varname);
                 plotvar++;
             }
-            
-            //Disabling implicit multithreading for debugging
-            if (debug == true) 
+            vector<const char *>::iterator storevar = var2bestored->begin();
+            while (storevar != var2bestored->end())
             {
-                b2munode = std::make_unique<ROOT::RDF::RNode>(b2munode->Define("Pisa_phi", "(Float_t)b_c_pisa_threemomentum.Phi()"));
-                auto d1 = b2munode->Display({"mu1_grandmother_phi", "Pisa_phi", "phi_breco_beam", "Bphi", "phi_3mumomenta_reco"}, 100);
-                d1->Print();
+                // Defining a column with the required variable
+                if (BtoMu.HasColumn(*storevar) == true)
+                {
+                    if (b2munode->HasColumn(*storevar) == false) b2munode = std::make_unique<ROOT::RDF::RNode>(b2munode->Define(*storevar, *storevar));
+                    vartobestored.push_back(*storevar);
+                }
+                storevar++;                
             }
-            
+
             // Modifying write options of the root data frame to overwrite other trees
             ROOT::RDF::RSnapshotOptions snapopt;
             snapopt.fMode = "UPDATE";
             snapopt.fOverwriteIfExists = "TRUE";
             b2munode->Snapshot(TString::Format("%s_%s", fileiterator->labeltxt.Data(), treeiterator->name.Data()), "ManipulatedVariables.root", vartobestored, snapopt);
             
+            if (BtoMu.HasColumn("is_signal_channel")==true)
+            {
+                auto b2munode_signal = b2munode->Filter("is_signal_channel==1");
+                auto b2munode_normal = b2munode->Filter("is_signal_channel==0");
+                b2munode_signal.Snapshot(TString::Format("%s_%s_signal", fileiterator->labeltxt.Data(), treeiterator->name.Data()), "ManipulatedVariables.root", vartobestored, snapopt);
+                b2munode_normal.Snapshot(TString::Format("%s_%s_normal", fileiterator->labeltxt.Data(), treeiterator->name.Data()), "ManipulatedVariables.root", vartobestored, snapopt);
+            }
+
             TFile Manfile("ManipulatedVariables.root", "update");
             TTree *Readtree = (TTree *)Manfile.Get(TString::Format("%s_%s", fileiterator->labeltxt.Data(), treeiterator->name.Data())); 
-            cout << ": sample with " << Readtree->GetEntries() << " entries" << endl;
-            plotvar = vartobeplotted.begin();
-            while (plotvar != vartobeplotted.end())
+            cout << ": sample with " << Readtree->GetEntries() << " entries" << endl << endl;
+
+            //Disabling implicit multithreading for debugging
+            if (debug == true) 
+            {
+                b2munode = std::make_unique<ROOT::RDF::RNode>(b2munode->Define("Pisa_phi", "(Float_t)b_c_pisa_threemomentum.Phi()"));
+                auto d1 = b2munode->Display({"mu1_grandmother_phi", "Pisa_phi", "phi_breco_beam", "Bphi", "phi_3mumomenta_reco"}, 100);
+                d1->Print();
+                cout << endl;
+            }
+
+            plotvar = vartobeplotted->begin();
+            while (plotvar != vartobeplotted->end())
             {
                 // Opening the freshly written file
                 TFile ManipulatedFile("ManipulatedVariables.root", "update");
@@ -89,7 +118,7 @@ int DiscriminantsPlotter(vector<MarkedNames> file2read,
                                                            100, min, max),
                                                       {plotvar->varname.data()});
 
-                cout << "RMS of "<< plotvar->varname << " " << histang->GetRMS() << " +- " << histang->GetRMSError() << endl;
+                if (debug == false) cout << "RMS of "<< plotvar->varname << " " << histang->GetRMS() << " +- " << histang->GetRMSError() << endl;
 
                 if (plotvar->tobeprinted == true)
                 {
@@ -133,7 +162,7 @@ int DiscriminantsPlotter(vector<MarkedNames> file2read,
                     TCanvas canvas_comparison_ratio = TCanvas("canvas_comparison_ratio", "canvas_comparison_ratio", 1366, 768);
                     TCanvas canvas_comparison_scatter = TCanvas("canvas_comparison_scatter", "canvas_comparison_scatter", 1366, 768);
                     auto *legend = new TLegend(0.1, 0.8, 0.28, 0.9);
-                    for (vector<VarToBePlotted>::iterator compit = vartobeplotted.begin(); compit < vartobeplotted.end(); compit++)
+                    for (vector<VarToBePlotted>::iterator compit = vartobeplotted->begin(); compit < vartobeplotted->end(); compit++)
                     {
                         if ((plotvar->comparisonlabel) == (compit->comparisonlabel) && plotvar->comparisonlabel.compare("") != 0)
                         {
@@ -149,7 +178,7 @@ int DiscriminantsPlotter(vector<MarkedNames> file2read,
                             histcompare->SetFillStyle(1001);
                             histcompare->SetMarkerStyle(kFullSquare);
                             histcompare->SetMarkerSize(1.5);
-                            if (compit == vartobeplotted.begin()) histcompare->DrawNormalized("HF PLC PMC");
+                            if (compit == vartobeplotted->begin()) histcompare->DrawNormalized("HF PLC PMC");
                             else histcompare->DrawNormalized("SAME HF PLC PMC");
                             canvas_comparison.SetLogy();
                             canvas_comparison.Update();
@@ -259,9 +288,6 @@ int DiscriminantsPlotter(vector<MarkedNames> file2read,
 
                 plotvar++;
             }
-
-            TFile ManipulatedFile("gen_studies.root", "update");
-            TTree *ReadTree = (TTree *)ManipulatedFile.Get("rootuple/ntuple");
 
             // Storing histograms to be comparedeta
             ROOT::RDF::RResultPtr<TH1F> hetagenepvsvreco, hetagenepvrecosvgene, hetagenepvgenesvreco;
@@ -462,8 +488,8 @@ int DiscriminantsPlotter(vector<MarkedNames> file2read,
             c0->Clear();
             for (int i = 1; i<=8; i++)
             {
-                cout << "Errore Eta beam-breco Bin : " << i << " " << hprofile_eta_res_grandmother_beambreco->GetBinError(i) << endl;
-                cout << "Errore Eta 3mureco Bin : " << i << " " << hprofile_eta_res_grandmother_3mu->GetBinError(i) << endl;
+                if (debug == false) cout << "Errore Eta beam-breco Bin : " << i << " " << hprofile_eta_res_grandmother_beambreco->GetBinError(i) << endl;
+                if (debug == false) cout << "Errore Eta 3mureco Bin : " << i << " " << hprofile_eta_res_grandmother_3mu->GetBinError(i) << endl;
             }
 
             //Profile histogram for phi
@@ -516,8 +542,8 @@ int DiscriminantsPlotter(vector<MarkedNames> file2read,
             c0->Clear();
             for (int i = 1; i<=8; i++)
             {
-                cout << "Errore Phi beam-breco Bin : " << i << " " << hprofile_phi_res_grandmother_beambreco->GetBinError(i) << endl;
-                cout << "Errore Phi 3mureco Bin : " << i << " " << hprofile_phi_res_grandmother_3mu->GetBinError(i) << endl;
+                if (debug == false) cout << "Errore Phi beam-breco Bin : " << i << " " << hprofile_phi_res_grandmother_beambreco->GetBinError(i) << endl;
+                if (debug == false) cout << "Errore Phi 3mureco Bin : " << i << " " << hprofile_phi_res_grandmother_3mu->GetBinError(i) << endl;
             }
 
             //Profile histogram for cos(grandmother-vector)
@@ -570,12 +596,14 @@ int DiscriminantsPlotter(vector<MarkedNames> file2read,
             c0->Clear();
             for (int i = 1; i<=8; i++)
             {
-                cout << "Errore Cos(alfa) beam-breco Bin : " << i << " " << hprofile_cos_angle_res_grandmother_beambreco->GetBinError(i) << endl;
-                cout << "Errore Cos(alfa) 3mureco Bin : " << i << " " << hprofile_cos_angle_res_grandmother_3mu->GetBinError(i) << endl;
+                if (debug == false) cout << "Errore Cos(alfa) beam-breco Bin : " << i << " " << hprofile_cos_angle_res_grandmother_beambreco->GetBinError(i) << endl;
+                if (debug == false) cout << "Errore Cos(alfa) 3mureco Bin : " << i << " " << hprofile_cos_angle_res_grandmother_3mu->GetBinError(i) << endl;
             }
-            cout << endl << endl;
+            if (debug == false) cout << endl << endl;
         }
         c0->Print(TString::Format("%s]", outhistpdf.Data()));
     }
+
+    if (debug==false) ROOT::DisableImplicitMT();
     return 0;
 }

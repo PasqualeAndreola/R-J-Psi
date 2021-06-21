@@ -8,6 +8,8 @@
 #ifndef MARKEDNAMES_H
 #define MARKEDNAMES_H
 
+using namespace std;
+
 class MarkedNames
 {
 public:
@@ -17,14 +19,16 @@ public:
     int geneflag = -1;
     TString dime;
     TString labeltxt;
-    MarkedNames(TString rnm, int rfl, TString measure = TString(), TString labeltext = TString())
+    vector<const char *> columns = {""};
+    MarkedNames(TString rnm, int rfl, TString measure = TString(), TString labeltext = TString(), vector<const char *> columnsrequired = {""})
     {
         name = rnm;
         flag = rfl;
         dime = measure;
         labeltxt = labeltext;
+        columns = columnsrequired;
     };
-    MarkedNames(TString rnm, int rfl, TString gnm, int gfl, TString measure = TString(), TString labeltext = TString())
+    MarkedNames(TString rnm, int rfl, TString gnm, int gfl, TString measure = TString(), TString labeltext = TString(), vector<const char *> columnsrequired = {""})
     {
         if (rfl == 1)
         {
@@ -34,6 +38,7 @@ public:
             geneflag = gfl;
             dime = measure;
             labeltxt = labeltext;
+            columns = columnsrequired;
         }
         else if (rfl == 0)
         {
@@ -43,6 +48,7 @@ public:
             geneflag = rfl;
             dime = measure;
             labeltxt = labeltext;
+            columns = columnsrequired;
         }
     };
 };

@@ -24,6 +24,6 @@
 /*These namespaces can be useful*/
 using namespace std;
 
-int TreeReader(vector<MarkedNames> file2read, vector<MarkedNames> trees2read, vector<MarkedNames> var2read);
+int TreeReader(vector<MarkedNames> file2read, vector<MarkedNames> trees2read, vector<MarkedNames> *var2read);
 
 #endif

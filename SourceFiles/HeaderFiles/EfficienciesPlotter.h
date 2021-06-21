@@ -1,10 +1,10 @@
 /*! 
- *  \file DiscriminantsPlotter.h 
- *  \brief Header file for \ref DiscriminantsPlotter function
+ *  \file EfficienciesPlotter.h 
+ *  \brief Header file for \ref EfficienciesPlotter function
  */
 
-#ifndef DISCRIMINANTSPLOTTER_H
-#define DISCRIMINANTSPLOTTER_H
+#ifndef EFFICIENCIESPLOTTER_H
+#define EFFICIENCIESPLOTTER_H
 
 #include <iostream>
 #include <vector>
@@ -24,21 +24,21 @@
 #include <TPaveStats.h>
 #include "MarkedNames.h"
 #include <TLorentzVector.h>
-#include "VarToBePlotted.h"
+#include "DiscToBePlotted.h"
+#include "EffToBePlotted.h"
 #include <TColor.h>
 #include <TStyle.h>
 #include <TGraphErrors.h>
 #include <TFrame.h>
 #include <TRatioPlot.h>
 #include <TPaveText.h>
+#include <TMultiGraph.h>
 
 /*These namespaces can be useful*/
 using namespace std;
 
-int DiscriminantsPlotter(vector<MarkedNames> file2read, 
-                         vector<MarkedNames> trees2read, 
-                         vector<const char *> *var2bestored,
-                         vector<VarToBePlotted> *vartobeplotted,
-                         bool debug = false);
+int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
+                        vector<DiscToBePlotted> *tobediscriminated,
+                        bool debug = false);
 
 #endif

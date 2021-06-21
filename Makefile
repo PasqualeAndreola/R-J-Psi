@@ -14,6 +14,10 @@ OUTPUTDIR += OutputFiles/PNGPlots
 OUTPUTDIR += OutputFiles/PNGPlots/Angles
 OUTPUTDIR += OutputFiles/PNGPlots/Discriminants
 OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies
+OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/Q_squared
+OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/Missing_mass_squared
+OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/Missing_pt
+OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/ctau
 
 #Source and build file extension
 SRCEXT := cpp
@@ -29,6 +33,7 @@ INCLUDES     := $(INCROOT)
 
 #Libraries that has to be linked
 LIBSROOT 	 := $(shell root-config --libs)
+LIBSROOT     += -L/home/pasquale/root/lib -lRooFitCore -lRooFit
 LIBS 	 	 := $(LIBSROOT)
 
 #Sources and objects research

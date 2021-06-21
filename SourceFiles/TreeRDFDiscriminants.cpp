@@ -17,13 +17,14 @@
 
 int TreeRDFDiscriminants(vector<MarkedNames> file2read, 
                          vector<MarkedNames> trees2read, 
-                         vector<MarkedNames> var2read, 
-                         unordered_map<string, vector<string>> discriminantvariables,
+                         vector<MarkedNames> *var2read, 
+                         unordered_map<string, vector<string>> *discriminantvariables,
                          string filter,
-                         bool debugflag)
+                         bool debugdisplayflag,
+                         bool debugplotflag)
 {
     //Enabling multi-threading
-    ROOT::EnableImplicitMT();
+    if (debugdisplayflag == false) ROOT::EnableImplicitMT();
 
     //Removing old output file
     TFile output("Discriminants.root","recreate");
@@ -31,6 +32,8 @@ int TreeRDFDiscriminants(vector<MarkedNames> file2read,
 
     for (vector<MarkedNames>::iterator fileiterator = file2read.begin(); fileiterator != file2read.end(); ++fileiterator)
     {
+        cout << fileiterator->name.Data() << endl;
+
         // Opening the histogram collection
         TString outhistcol = TString::Format("OutputFiles/%s_Kinematics_Comparison.pdf", fileiterator->labeltxt.Data());
 
@@ -47,88 +50,138 @@ int TreeRDFDiscriminants(vector<MarkedNames> file2read,
             // Initializing a RootDataFrame from the input tree
             ROOT::RDataFrame BtoMuData(TString::Format("%s", treeiterator->name.Data()), TString::Format("InputFiles/%s", fileiterator->name.Data()));
 
-            // Defining the new discriminants as new columns from their lambda expression
-            auto BtoMu_discriminants = BtoMuData.Define("b_c_pisa_threemomentum", b_pisa_threemomentum, discriminantvariables["b_c_pisa_threemomentum"])
-                                                .Define("Q2_gene", squaredtransferredmomentumgen, discriminantvariables["Q2_gene"])
-                                                .Define("Q2_Pisa", squaredtransferredmomentumpisa, discriminantvariables["Q2_Pisa"])
-                                                .Define("Q2_Jona", squaredtransferredmomentumjona, discriminantvariables["Q2_Jona"])                                             
-                                                .Define("missingm2_gene", missingmasssquaredgen, discriminantvariables["missingm2_gene"])
-                                                .Define("missingm2_Pisa", missingmasssquaredpisa, discriminantvariables["missingm2_Pisa"])
-                                                .Define("missingm2_Jona", missingmasssquaredjona, discriminantvariables["missingm2_Jona"])
-                                                .Define("missingpt_gene", missingptgen, discriminantvariables["missingpt_gene"])
-                                                .Define("missingpt_Pisa", missingptpisa, discriminantvariables["missingpt_Pisa"])
-                                                .Define("missingpt_Jona", missingptjona, discriminantvariables["missingpt_Jona"])
-                                                .Define("eta_gene", eta, discriminantvariables["eta_gene"])
-                                                .Define("eta_PVgeneSVreco", eta, discriminantvariables["eta_PVgeneSVreco"])
-                                                .Define("eta_PVrecoSVgene", eta, discriminantvariables["eta_PVrecoSVgene"])
-                                                .Define("eta_reco", eta, discriminantvariables["eta_reco"])
-                                                .Define("eta_breco_beam", eta, discriminantvariables["eta_breco_beam"])
-                                                .Define("eta_breco_pv", eta, discriminantvariables["eta_breco_pv"])
-                                                .Define("eta_beamsvreco", eta, discriminantvariables["eta_beamsvreco"])
-                                                .Define("eta_genePVSVreco", deltaeta, discriminantvariables["eta_genePVSVreco"])
-                                                .Define("eta_genePVgeneSVreco", deltaeta, discriminantvariables["eta_genePVgeneSVreco"])
-                                                .Define("eta_genePVrecoSVgene", deltaeta, discriminantvariables["eta_genePVrecoSVgene"])
-                                                .Define("eta_3mumomenta_gene", eta_3mumomentum, discriminantvariables["eta_3mumomenta_gene"])
-                                                .Define("eta_3mumomenta_reco", eta_3mumomentum, discriminantvariables["eta_3mumomenta_reco"])
-                                                .Define("eta_BcPVgeneSVgene", deltaeta, discriminantvariables["eta_BcPVgeneSVgene"])
-                                                .Define("eta_BcPVgeneSVreco", deltaeta, discriminantvariables["eta_BcPVgeneSVreco"])
-                                                .Define("eta_BcPVrecoSVgene", deltaeta, discriminantvariables["eta_BcPVrecoSVgene"])
-                                                .Define("eta_BcPVrecoSVreco", deltaeta, discriminantvariables["eta_BcPVrecoSVreco"])
-                                                .Define("phi_gene", phi, discriminantvariables["phi_gene"])
-                                                .Define("phi_PVgeneSVreco", phi, discriminantvariables["phi_PVgeneSVreco"])
-                                                .Define("phi_PVrecoSVgene", phi, discriminantvariables["phi_PVrecoSVgene"])
-                                                .Define("phi_reco", phi, discriminantvariables["phi_reco"])
-                                                .Define("phi_breco_beam", phi, discriminantvariables["phi_breco_beam"])
-                                                .Define("phi_breco_pv", phi, discriminantvariables["phi_breco_pv"])
-                                                .Define("phi_beamsvreco", phi, discriminantvariables["phi_beamsvreco"])
-                                                .Define("phi_genePVSVreco", deltaphi, discriminantvariables["phi_genePVSVreco"])
-                                                .Define("phi_genePVgeneSVreco", deltaphi, discriminantvariables["phi_genePVgeneSVreco"])
-                                                .Define("phi_genePVrecoSVgene", deltaphi, discriminantvariables["phi_genePVrecoSVgene"])
-                                                .Define("phi_3mumomenta_gene", phi_3mumomentum, discriminantvariables["phi_3mumomenta_gene"])
-                                                .Define("phi_3mumomenta_reco", phi_3mumomentum, discriminantvariables["phi_3mumomenta_reco"])
-                                                .Define("phi_BcPVgeneSVgene", deltaphi, discriminantvariables["phi_BcPVgeneSVgene"])
-                                                .Define("phi_BcPVgeneSVreco", deltaphi, discriminantvariables["phi_BcPVgeneSVreco"])
-                                                .Define("phi_BcPVrecoSVgene", deltaphi, discriminantvariables["phi_BcPVrecoSVgene"])
-                                                .Define("phi_BcPVrecoSVreco", deltaphi, discriminantvariables["phi_BcPVrecoSVreco"])
-                                                .Define("angle_grandmother_pvsvgen", angle, discriminantvariables["angle_grandmother_pvsvgen"])
-                                                .Define("angle_grandmother_PVrecoBreco", angle, discriminantvariables["angle_grandmother_PVrecoBreco"])
-                                                .Define("angle_grandmother_BeamBreco", angle, discriminantvariables["angle_grandmother_BeamBreco"])
-                                                .Define("angle_grandmother_PVrecoJpsireco", angle, discriminantvariables["angle_grandmother_PVrecoJpsireco"])
-                                                .Define("angle_grandmother_BeamJpsireco", angle, discriminantvariables["angle_grandmother_BeamJpsireco"])
-                                                .Define("angle_grandmother_3mureco", angle3mu, discriminantvariables["angle_grandmother_3mureco"])
-                                                .Define("cos_angle_grandmother_pvsvgen", cosangle, discriminantvariables["cos_angle_grandmother_pvsvgen"])
-                                                .Define("cos_angle_grandmother_PVrecoBreco", cosangle, discriminantvariables["cos_angle_grandmother_PVrecoBreco"])
-                                                .Define("cos_angle_grandmother_BeamBreco", cosangle, discriminantvariables["cos_angle_grandmother_BeamBreco"])
-                                                .Define("cos_angle_grandmother_PVrecoJpsireco", cosangle, discriminantvariables["cos_angle_grandmother_PVrecoJpsireco"])
-                                                .Define("cos_angle_grandmother_BeamJpsireco", cosangle, discriminantvariables["cos_angle_grandmother_BeamJpsireco"])
-                                                .Define("cos_angle_grandmother_3mureco", cosangle3mu, discriminantvariables["cos_angle_grandmother_3mureco"])
-                                                .Filter(filter);
-
             // Modifying write options of the root data frame to overwrite other trees
             ROOT::RDF::RSnapshotOptions snapopt;
             snapopt.fMode = "UPDATE";
             snapopt.fOverwriteIfExists = "TRUE";
 
+            // Tree2BeWritten
+            TString Tree2bewritten = TString::Format("%s_%s", fileiterator->labeltxt.Data(), treeiterator->name.Data());
+
             // Adding every variable used in the various discriminants as a branch to be written in the tree
             vector<string> branch2bewritten;
-            unordered_map<string, vector<string>>::iterator i = discriminantvariables.begin(); 
-            while (i != discriminantvariables.end())
+            unordered_map<string, vector<string>>::iterator i = (*discriminantvariables).begin(); 
+            while (i != (*discriminantvariables).end())
             {
-                copy(i->second.begin(), i->second.end(), back_inserter(branch2bewritten));
-                branch2bewritten.push_back(i->first.data());
-                i++;
+                    copy(i->second.begin(), i->second.end(), back_inserter(branch2bewritten));
+                    branch2bewritten.push_back(i->first.data());
+                    i++;
             }
-            for (vector<MarkedNames>::iterator variterator = var2read.begin(); variterator != var2read.end(); ++variterator)
+            for (vector<MarkedNames>::iterator variterator = var2read->begin(); variterator != var2read->end(); ++variterator)
             {
                 branch2bewritten.push_back(variterator->name.Data());
                 if ((variterator->geneflag)!= (-1)) branch2bewritten.push_back(variterator->genename.Data());
             }
+            
+            // Defining the new discriminants as new columns from their lambda expression
+            auto BtoMu_discriminants = BtoMuData.Define("b_c_pisa_threemomentum", b_pisa_threemomentum, (*discriminantvariables)["b_c_pisa_threemomentum"])
+                                                .Define("eta_gene", eta, (*discriminantvariables)["eta_gene"])
+                                                .Define("eta_PVgeneSVreco", eta, (*discriminantvariables)["eta_PVgeneSVreco"])
+                                                .Define("eta_PVrecoSVgene", eta, (*discriminantvariables)["eta_PVrecoSVgene"])
+                                                .Define("eta_reco", eta, (*discriminantvariables)["eta_reco"])
+                                                .Define("eta_breco_beam", eta, (*discriminantvariables)["eta_breco_beam"])
+                                                .Define("eta_breco_pv", eta, (*discriminantvariables)["eta_breco_pv"])
+                                                .Define("eta_beamsvreco", eta, (*discriminantvariables)["eta_beamsvreco"])
+                                                .Define("eta_genePVSVreco", deltaeta, (*discriminantvariables)["eta_genePVSVreco"])
+                                                .Define("eta_genePVgeneSVreco", deltaeta, (*discriminantvariables)["eta_genePVgeneSVreco"])
+                                                .Define("eta_genePVrecoSVgene", deltaeta, (*discriminantvariables)["eta_genePVrecoSVgene"])
+                                                .Define("eta_3mumomenta_gene", eta_3mumomentum, (*discriminantvariables)["eta_3mumomenta_gene"])
+                                                .Define("eta_3mumomenta_reco", eta_3mumomentum, (*discriminantvariables)["eta_3mumomenta_reco"])
+                                                .Define("eta_BcPVgeneSVgene", deltaeta, (*discriminantvariables)["eta_BcPVgeneSVgene"])
+                                                .Define("eta_BcPVgeneSVreco", deltaeta, (*discriminantvariables)["eta_BcPVgeneSVreco"])
+                                                .Define("eta_BcPVrecoSVgene", deltaeta, (*discriminantvariables)["eta_BcPVrecoSVgene"])
+                                                .Define("eta_BcPVrecoSVreco", deltaeta, (*discriminantvariables)["eta_BcPVrecoSVreco"])
+                                                .Define("phi_gene", phi, (*discriminantvariables)["phi_gene"])
+                                                .Define("phi_PVgeneSVreco", phi, (*discriminantvariables)["phi_PVgeneSVreco"])
+                                                .Define("phi_PVrecoSVgene", phi, (*discriminantvariables)["phi_PVrecoSVgene"])
+                                                .Define("phi_reco", phi, (*discriminantvariables)["phi_reco"])
+                                                .Define("phi_breco_beam", phi, (*discriminantvariables)["phi_breco_beam"])
+                                                .Define("phi_breco_pv", phi, (*discriminantvariables)["phi_breco_pv"])
+                                                .Define("phi_beamsvreco", phi, (*discriminantvariables)["phi_beamsvreco"])
+                                                .Define("phi_genePVSVreco", deltaphi, (*discriminantvariables)["phi_genePVSVreco"])
+                                                .Define("phi_genePVgeneSVreco", deltaphi, (*discriminantvariables)["phi_genePVgeneSVreco"])
+                                                .Define("phi_genePVrecoSVgene", deltaphi, (*discriminantvariables)["phi_genePVrecoSVgene"])
+                                                .Define("phi_3mumomenta_gene", phi_3mumomentum, (*discriminantvariables)["phi_3mumomenta_gene"])
+                                                .Define("phi_3mumomenta_reco", phi_3mumomentum, (*discriminantvariables)["phi_3mumomenta_reco"])
+                                                .Define("phi_BcPVgeneSVgene", deltaphi, (*discriminantvariables)["phi_BcPVgeneSVgene"])
+                                                .Define("phi_BcPVgeneSVreco", deltaphi, (*discriminantvariables)["phi_BcPVgeneSVreco"])
+                                                .Define("phi_BcPVrecoSVgene", deltaphi, (*discriminantvariables)["phi_BcPVrecoSVgene"])
+                                                .Define("phi_BcPVrecoSVreco", deltaphi, (*discriminantvariables)["phi_BcPVrecoSVreco"])
+                                                .Define("angle_grandmother_pvsvgen", angle, (*discriminantvariables)["angle_grandmother_pvsvgen"])
+                                                .Define("angle_grandmother_PVrecoBreco", angle, (*discriminantvariables)["angle_grandmother_PVrecoBreco"])
+                                                .Define("angle_grandmother_BeamBreco", angle, (*discriminantvariables)["angle_grandmother_BeamBreco"])
+                                                .Define("angle_grandmother_PVrecoJpsireco", angle, (*discriminantvariables)["angle_grandmother_PVrecoJpsireco"])
+                                                .Define("angle_grandmother_BeamJpsireco", angle, (*discriminantvariables)["angle_grandmother_BeamJpsireco"])
+                                                .Define("angle_grandmother_3mureco", angle3mu, (*discriminantvariables)["angle_grandmother_3mureco"])
+                                                .Define("cos_angle_grandmother_pvsvgen", cosangle, (*discriminantvariables)["cos_angle_grandmother_pvsvgen"])
+                                                .Define("cos_angle_grandmother_PVrecoBreco", cosangle, (*discriminantvariables)["cos_angle_grandmother_PVrecoBreco"])
+                                                .Define("cos_angle_grandmother_BeamBreco", cosangle, (*discriminantvariables)["cos_angle_grandmother_BeamBreco"])
+                                                .Define("cos_angle_grandmother_PVrecoJpsireco", cosangle, (*discriminantvariables)["cos_angle_grandmother_PVrecoJpsireco"])
+                                                .Define("cos_angle_grandmother_BeamJpsireco", cosangle, (*discriminantvariables)["cos_angle_grandmother_BeamJpsireco"])
+                                                .Define("cos_angle_grandmother_3mureco", cosangle3mu, (*discriminantvariables)["cos_angle_grandmother_3mureco"])
+                                                .Define("Q2_Gene", squaredtransferredmomentumgen, (*discriminantvariables)["Q2_Gene"])
+                                                .Define("Q2_Pisa", squaredtransferredmomentumpisa, (*discriminantvariables)["Q2_Pisa"])
+                                                .Define("Q2_Jona", squaredtransferredmomentumjona, (*discriminantvariables)["Q2_Jona"])                                             
+                                                .Define("MissingM2_Gene", missingmasssquaredgen, (*discriminantvariables)["MissingM2_Gene"])
+                                                .Define("MissingM2_Pisa", missingmasssquaredpisa, (*discriminantvariables)["MissingM2_Pisa"])
+                                                .Define("MissingM2_Jona", missingmasssquaredjona, (*discriminantvariables)["MissingM2_Jona"])
+                                                .Define("MissingPt_Gene", missingptgen, (*discriminantvariables)["MissingPt_Gene"])
+                                                .Define("MissingPt_Pisa", missingptpisa, {(*discriminantvariables)["MissingPt_Pisa"]})
+                                                .Define("MissingPt_Jona", missingptjona, (*discriminantvariables)["MissingPt_Jona"])
+                                                .Define("ctau_Gene", ctaugene, (*discriminantvariables)["ctau_Gene"])
+                                                .Define("ctau_Pisa", ctaupisa, (*discriminantvariables)["ctau_Pisa"])
+                                                .Define("ctau_Jona", ctaujona, (*discriminantvariables)["ctau_Jona"])
+                                                .Filter(filter);
 
+            if ((BtoMuData.HasColumn("mu1_grandmother_pt_regression")) == true)
+            {
+                BtoMu_discriminants = BtoMu_discriminants.Define(("b_c_pisa_threemomentum_regression"), b_pisa_threemomentum_regression, (*discriminantvariables)["b_c_pisa_threemomentum_regression"])
+                                                         .Define("Q2_Gene_regression", squaredtransferredmomentumgen, (*discriminantvariables)["Q2_Gene_regression"])
+                                                         .Define("Q2_Pisa_regression", squaredtransferredmomentumpisa_regression, (*discriminantvariables)["Q2_Pisa_regression"])
+                                                         .Define("Q2_Jona_regression", squaredtransferredmomentumjona_regression, (*discriminantvariables)["Q2_Jona_regression"])                                             
+                                                         .Define("MissingM2_Gene_regression", missingmasssquaredgen, (*discriminantvariables)["MissingM2_Gene_regression"])
+                                                         .Define("MissingM2_Pisa_regression", missingmasssquaredpisa_regression, (*discriminantvariables)["MissingM2_Pisa_regression"])
+                                                         .Define("MissingM2_Jona_regression", missingmasssquaredjona_regression, (*discriminantvariables)["MissingM2_Jona_regression"])
+                                                         .Define("MissingPt_Gene_regression", missingptgen, (*discriminantvariables)["MissingPt_Gene_regression"])
+                                                         .Define("MissingPt_Pisa_regression", missingptpisa_regression, (*discriminantvariables)["MissingPt_Pisa_regression"])
+                                                         .Define("MissingPt_Jona_regression", missingptjona_regression, (*discriminantvariables)["MissingPt_Jona_regression"])
+                                                         .Define("ctau_Gene_regression", ctaugene, (*discriminantvariables)["ctau_Gene_regression"])
+                                                         .Define("ctau_Pisa_regression", ctaupisa_regression, (*discriminantvariables)["ctau_Pisa_regression"])
+                                                         .Define("ctau_Jona_regression", ctaujona_regression, (*discriminantvariables)["ctau_Jona_regression"])                                                         
+                                                         .Filter(filter);
+            }
+
+            // Checking that every variable that has to be written is in the input file: elsewhere, it will be removed
+            for (vector<string>::iterator variablechecker = branch2bewritten.begin(); variablechecker != branch2bewritten.end(); variablechecker++)
+            {
+                if (BtoMu_discriminants.HasColumn(variablechecker->data()) == false)
+                {
+                    cout << "Removing \"" << variablechecker->c_str() << "\" variable, because is not present in the RootDataFrame" << endl;
+                    std::vector<string>::iterator itr = std::find(branch2bewritten.begin(), branch2bewritten.end(), variablechecker->data());
+                    if (itr != branch2bewritten.end()) 
+                    {
+                        branch2bewritten.erase(itr);
+                        variablechecker = branch2bewritten.begin();
+                    }
+                }
+            }
+            cout << endl;
+            
             // Writing the new RDF with discriminants and their variables
-            TString Tree2bewritten = TString::Format("%s_%s", fileiterator->labeltxt.Data(), treeiterator->name.Data());
             BtoMu_discriminants.Snapshot(Tree2bewritten.Data(), "Discriminants.root", branch2bewritten, snapopt);
 
-            if (debugflag==false)
+            // Checking specific quantities in the input files
+            if (debugdisplayflag == true)
+            {
+                if (BtoMu_discriminants.HasColumn("is_signal_channel"))
+                {
+                    auto d1 = BtoMu_discriminants.Display({"is_signal_channel"},1000);
+                    d1->Print();
+                }
+            }
+
+            // Plotting, if not in debug mode
+            if (debugplotflag==true)
             {
                 TFile ComparisonFile("Discriminants.root", "update");
                 TTree *ReadTree = (TTree*)ComparisonFile.Get(Tree2bewritten.Data());
@@ -137,7 +190,7 @@ int TreeRDFDiscriminants(vector<MarkedNames> file2read,
                 TCanvas *c0 = new TCanvas(TString::Format("c%s", fileiterator->name.Data()), TString::Format("c%s", fileiterator->name.Data()), 1366, 768);
                 c0->Print(TString::Format("%s[", outhistcol.Data()));
 
-                for (vector<MarkedNames>::iterator variterator = var2read.begin(); variterator != var2read.end(); ++variterator)
+                for (vector<MarkedNames>::iterator variterator = var2read->begin(); variterator != var2read->end(); ++variterator)
                 {
                     Float_t recomin = ReadTree->GetMinimum(variterator->name.Data());
                     Float_t recomax = ReadTree->GetMaximum(variterator->name.Data());
@@ -357,5 +410,7 @@ int TreeRDFDiscriminants(vector<MarkedNames> file2read,
         }
         inputfile.Close();
     }
+
+    ROOT::DisableImplicitMT();
     return 0;
 }

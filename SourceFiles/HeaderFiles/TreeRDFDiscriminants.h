@@ -29,9 +29,10 @@ using namespace std;
 
 int TreeRDFDiscriminants(vector<MarkedNames> file2read, 
                          vector<MarkedNames> trees2read, 
-                         vector<MarkedNames> var2read, 
-                         unordered_map<string, vector<string>> discriminantvariables,
+                         vector<MarkedNames> *var2read, 
+                         unordered_map<string, vector<string>> *discriminantvariables,
                          string filter,
-                         bool debugflag = false);
+                         bool debugdisplayflag = false,
+                         bool debugplotflag = false);
 
 #endif

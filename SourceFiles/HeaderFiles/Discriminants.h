@@ -177,6 +177,28 @@ auto b_pisa_threemomentum = [](Float_t mu1_pt, Float_t mu1_eta, Float_t mu1_phi,
   return b_pisa;
 };
 
+auto b_pisa_threemomentum_regression = [](Float_t mu1_pt, Float_t mu1_eta, Float_t mu1_phi,
+                               Float_t mu2_pt, Float_t mu2_eta, Float_t mu2_phi,
+                               Float_t k_pt, Float_t k_eta, Float_t k_phi,
+                               Float_t beamspot_x, Float_t beamspot_y, Float_t pv_z,
+                               Float_t bvtx_vtx_x, Float_t bvtx_vtx_y, Float_t bvtx_vtx_z,
+                               Float_t mu1_grandmother_pt_regression) {
+  TVector3 mu1_threemomentum, mu2_threemomentum, k_threemomentum, threemuons;
+  mu1_threemomentum.SetPtEtaPhi(mu1_pt, mu1_eta, mu1_phi);
+  mu2_threemomentum.SetPtEtaPhi(mu2_pt, mu2_eta, mu2_phi);
+  k_threemomentum.SetPtEtaPhi(k_pt, k_eta, k_phi);
+  threemuons = mu1_threemomentum + mu2_threemomentum + k_threemomentum;
+
+  TVector3 vector1 = TVector3(beamspot_x, beamspot_y, pv_z);
+  TVector3 vector2 = TVector3(bvtx_vtx_x, bvtx_vtx_y, bvtx_vtx_z);
+  Float_t phi = (vector2 - vector1).Phi();
+
+  TVector3 b_pisa;
+  b_pisa.SetPtEtaPhi(mu1_grandmother_pt_regression, threemuons.Eta(), phi);
+
+  return b_pisa;
+};
+
 auto squaredtransferredmomentumgen = [](Float_t Bpt, Float_t Beta, Float_t Bphi,
                                      Float_t mu1pt, Float_t mu1eta, Float_t mu1phi,
                                      Float_t mu2pt, Float_t mu2eta, Float_t mu2phi) {
@@ -207,6 +229,21 @@ auto squaredtransferredmomentumjona = [](Float_t Bpt, Float_t Beta, Float_t Bphi
   return (Float_t)(pmu_B - pmu_mu1 - pmu_mu2).Mag2();
 };
 
+auto squaredtransferredmomentumjona_regression = [](Float_t Bpt, Float_t Beta, Float_t Bphi, Float_t Bmass,
+                                                    Float_t mu1pt, Float_t mu1eta, Float_t mu1phi, Float_t mu1mass,
+                                                    Float_t mu2pt, Float_t mu2eta, Float_t mu2phi, Float_t mu2mass) {
+
+  Float_t Bc_MASS = 6.2756;
+
+  TLorentzVector pmu_B, pmu_mu1, pmu_mu2;
+
+  pmu_B.SetPtEtaPhiM(Bpt, Beta, Bphi, Bc_MASS);
+  pmu_mu1.SetPtEtaPhiM(mu1pt, mu1eta, mu1phi, mu1mass);
+  pmu_mu2.SetPtEtaPhiM(mu2pt, mu2eta, mu2phi, mu2mass);
+
+  return (Float_t)(pmu_B - pmu_mu1 - pmu_mu2).Mag2();
+};
+
 auto squaredtransferredmomentumpisa = [](TVector3 b_pisa, Float_t Bmass,
                                          Float_t mu1pt, Float_t mu1eta, Float_t mu1phi, Float_t mu1mass,
                                          Float_t mu2pt, Float_t mu2eta, Float_t mu2phi, Float_t mu2mass) {
@@ -216,6 +253,21 @@ auto squaredtransferredmomentumpisa = [](TVector3 b_pisa, Float_t Bmass,
   Float_t BPt = b_pisa.Pt()*(Bc_MASS/Bmass);
   
   pmu_b_pisa.SetPtEtaPhiM(BPt, b_pisa.Eta(), b_pisa.Phi(), Bc_MASS);
+  pmu_mu1.SetPtEtaPhiM(mu1pt, mu1eta, mu1phi, mu1mass);
+  pmu_mu2.SetPtEtaPhiM(mu2pt, mu2eta, mu2phi, mu2mass);
+
+  return (Float_t)(pmu_b_pisa - pmu_mu1 - pmu_mu2).Mag2();
+};
+
+auto squaredtransferredmomentumpisa_regression = [](TVector3 b_pisa_regression, Float_t Bmass,
+                                                    Float_t mu1pt, Float_t mu1eta, Float_t mu1phi, Float_t mu1mass,
+                                                    Float_t mu2pt, Float_t mu2eta, Float_t mu2phi, Float_t mu2mass) {
+
+  Float_t Bc_MASS = 6.2756;
+
+  TLorentzVector pmu_b_pisa, pmu_mu1, pmu_mu2;
+  
+  pmu_b_pisa.SetPtEtaPhiM(b_pisa_regression.Pt(), b_pisa_regression.Eta(), b_pisa_regression.Phi(), Bc_MASS);
   pmu_mu1.SetPtEtaPhiM(mu1pt, mu1eta, mu1phi, mu1mass);
   pmu_mu2.SetPtEtaPhiM(mu2pt, mu2eta, mu2phi, mu2mass);
 
@@ -256,6 +308,23 @@ auto missingmasssquaredjona = [](Float_t Bpt, Float_t Beta, Float_t Bphi, Float_
   return (Float_t)(pmu_B - pmu_mu1 - pmu_mu2 - pmu_k).Mag2();
 };
 
+auto missingmasssquaredjona_regression = [](Float_t Bpt, Float_t Beta, Float_t Bphi, Float_t Bmass,
+                             Float_t mu1pt, Float_t mu1eta, Float_t mu1phi, Float_t mu1mass,
+                             Float_t mu2pt, Float_t mu2eta, Float_t mu2phi, Float_t mu2mass,
+                             Float_t kpt, Float_t keta, Float_t kphi, Float_t kmass) {
+
+  Float_t Bc_MASS = 6.2756;
+
+  TLorentzVector pmu_B, pmu_mu1, pmu_mu2, pmu_k;
+
+  pmu_B.SetPtEtaPhiM(Bpt, Beta, Bphi, Bc_MASS);
+  pmu_mu1.SetPtEtaPhiM(mu1pt, mu1eta, mu1phi, mu1mass);
+  pmu_mu2.SetPtEtaPhiM(mu2pt, mu2eta, mu2phi, mu2mass);
+  pmu_k.SetPtEtaPhiM(kpt, keta, kphi, kmass);
+
+  return (Float_t)(pmu_B - pmu_mu1 - pmu_mu2 - pmu_k).Mag2();
+};
+
 auto missingmasssquaredpisa = [](TVector3 b_pisa, Float_t Bmass,
                              Float_t mu1pt, Float_t mu1eta, Float_t mu1phi, Float_t mu1mass,
                              Float_t mu2pt, Float_t mu2eta, Float_t mu2phi, Float_t mu2mass,
@@ -266,6 +335,23 @@ auto missingmasssquaredpisa = [](TVector3 b_pisa, Float_t Bmass,
   Float_t BPt = b_pisa.Pt()*(Bc_MASS/Bmass);
 
   pmu_b_pisa.SetPtEtaPhiM(BPt, b_pisa.Eta(), b_pisa.Phi(), Bc_MASS);
+  pmu_mu1.SetPtEtaPhiM(mu1pt, mu1eta, mu1phi, mu1mass);
+  pmu_mu2.SetPtEtaPhiM(mu2pt, mu2eta, mu2phi, mu2mass);
+  pmu_k.SetPtEtaPhiM(kpt, keta, kphi, kmass);
+
+  return (Float_t)(pmu_b_pisa - pmu_mu1 - pmu_mu2 - pmu_k).Mag2();
+};
+
+auto missingmasssquaredpisa_regression = [](TVector3 b_pisa_regression, Float_t Bmass,
+                             Float_t mu1pt, Float_t mu1eta, Float_t mu1phi, Float_t mu1mass,
+                             Float_t mu2pt, Float_t mu2eta, Float_t mu2phi, Float_t mu2mass,
+                             Float_t kpt, Float_t keta, Float_t kphi, Float_t kmass) {
+
+  Float_t Bc_MASS = 6.2756;
+
+  TLorentzVector pmu_b_pisa, pmu_mu1, pmu_mu2, pmu_k;
+
+  pmu_b_pisa.SetPtEtaPhiM(b_pisa_regression.Pt(), b_pisa_regression.Eta(), b_pisa_regression.Phi(), Bc_MASS);
   pmu_mu1.SetPtEtaPhiM(mu1pt, mu1eta, mu1phi, mu1mass);
   pmu_mu2.SetPtEtaPhiM(mu2pt, mu2eta, mu2phi, mu2mass);
   pmu_k.SetPtEtaPhiM(kpt, keta, kphi, kmass);
@@ -285,12 +371,132 @@ auto missingptjona = [](Float_t Bpt, Float_t Bmass, Float_t mu1pt, Float_t mu2pt
   return (Float_t)(BPt - mu1pt - mu2pt - kpt);
 };
 
+auto missingptjona_regression = [](Float_t Bpt, Float_t mu1pt, Float_t mu2pt, Float_t kpt) {
+  
+  return (Float_t)(Bpt - mu1pt - mu2pt - kpt);
+};
+
 auto missingptpisa = [](TVector3 b_pisa, Float_t Bmass, Float_t mu1pt, Float_t mu2pt, Float_t kpt) {
+
   Float_t Bc_MASS = 6.2756;
 
   Float_t BPt = b_pisa.Pt() * (Bc_MASS / Bmass);
 
   return (Float_t)(BPt - mu1pt - mu2pt - kpt);
+};
+
+auto missingptpisa_regression = [](TVector3 b_pisa_threemomentum_regression, Float_t mu1pt, Float_t mu2pt, Float_t kpt) {
+
+  return (Float_t)(b_pisa_threemomentum_regression.Pt() - mu1pt - mu2pt - kpt);
+};
+
+auto ctaugene = [](Float_t pvtx_x, Float_t pvtx_y, Float_t pvtx_z, 
+                   Float_t bvtx_x, Float_t bvtx_y, Float_t bvtx_z,
+                   Float_t b_pt, Float_t b_eta, Float_t b_phi) {
+
+  Float_t Bc_MASS = 6.2756;
+
+  TVector3 pvtx, bvtx;
+  Float_t pvbv_distance;
+  pvtx.SetXYZ(pvtx_x, pvtx_y, pvtx_z);
+  bvtx.SetXYZ(bvtx_x, bvtx_y, bvtx_z);
+  pvbv_distance = (bvtx - pvtx).Mag();
+
+  TLorentzVector bmu;
+  Float_t gammabeta;
+  bmu.SetPtEtaPhiM(b_pt, b_eta, b_phi, Bc_MASS);
+  gammabeta = bmu.Gamma() * bmu.Beta();
+  
+  Float_t ctau = pvbv_distance / gammabeta;
+  return (Float_t)(ctau);
+};
+
+auto ctaujona = [](Float_t pvtx_x, Float_t pvtx_y, Float_t pvtx_z, 
+                   Float_t bvtx_x, Float_t bvtx_y, Float_t bvtx_z,
+                   Float_t b_pt, Float_t b_eta, Float_t b_phi, Float_t b_mass) {
+
+  Float_t Bc_MASS = 6.2756;
+
+  Float_t B_pt = b_pt * (Bc_MASS / b_mass);
+
+  TVector3 pvtx, bvtx;
+  Float_t pvbv_distance;
+  pvtx.SetXYZ(pvtx_x, pvtx_y, pvtx_z);
+  bvtx.SetXYZ(bvtx_x, bvtx_y, bvtx_z);
+  pvbv_distance = (bvtx - pvtx).Mag();
+
+  TLorentzVector bmu;
+  Float_t gammabeta;
+  bmu.SetPtEtaPhiM(B_pt, b_eta, b_phi, Bc_MASS);
+  gammabeta = bmu.Gamma() * bmu.Beta();
+  
+  Float_t ctau = pvbv_distance / gammabeta;
+  return (Float_t)(ctau);
+};
+
+auto ctaujona_regression = [](Float_t pvtx_x, Float_t pvtx_y, Float_t pvtx_z, 
+                   Float_t bvtx_x, Float_t bvtx_y, Float_t bvtx_z,
+                   Float_t b_pt, Float_t b_eta, Float_t b_phi, Float_t b_mass) {
+  
+  Float_t Bc_MASS = 6.2756;
+
+  TVector3 pvtx, bvtx;
+  Float_t pvbv_distance;
+  pvtx.SetXYZ(pvtx_x, pvtx_y, pvtx_z);
+  bvtx.SetXYZ(bvtx_x, bvtx_y, bvtx_z);
+  pvbv_distance = (bvtx - pvtx).Mag();
+
+  TLorentzVector bmu;
+  Float_t gammabeta;
+  bmu.SetPtEtaPhiM(b_pt, b_eta, b_phi, Bc_MASS);
+  gammabeta = bmu.Gamma() * bmu.Beta();
+  
+  Float_t ctau = pvbv_distance / gammabeta;
+  return (Float_t)(ctau);
+};
+
+auto ctaupisa = [](Float_t pvtx_x, Float_t pvtx_y, Float_t pvtx_z, 
+                   Float_t bvtx_x, Float_t bvtx_y, Float_t bvtx_z,
+                   TVector3 b_pisa_vec3, Float_t b_mass) {
+  
+  Float_t Bc_MASS = 6.2756;
+
+  Float_t B_pt = b_pisa_vec3.Pt() * (Bc_MASS / b_mass);
+
+  TVector3 pvtx, bvtx;
+  Float_t pvbv_distance;
+  pvtx.SetXYZ(pvtx_x, pvtx_y, pvtx_z);
+  bvtx.SetXYZ(bvtx_x, bvtx_y, bvtx_z);
+  pvbv_distance = (bvtx - pvtx).Mag();
+
+  TLorentzVector bmu;
+  Float_t gammabeta;
+  bmu.SetPtEtaPhiM(B_pt, b_pisa_vec3.Eta(), b_pisa_vec3.Phi(), Bc_MASS);
+  gammabeta = bmu.Gamma() * bmu.Beta();
+  
+  Float_t ctau = pvbv_distance / gammabeta;
+  return (Float_t)(ctau);
+};
+
+auto ctaupisa_regression = [](Float_t pvtx_x, Float_t pvtx_y, Float_t pvtx_z, 
+                              Float_t bvtx_x, Float_t bvtx_y, Float_t bvtx_z,
+                              TVector3 b_pisa_regression_vec3, Float_t b_mass) {
+  
+  Float_t Bc_MASS = 6.2756;
+  
+  TVector3 pvtx, bvtx;
+  Float_t pvbv_distance;
+  pvtx.SetXYZ(pvtx_x, pvtx_y, pvtx_z);
+  bvtx.SetXYZ(bvtx_x, bvtx_y, bvtx_z);
+  pvbv_distance = (bvtx - pvtx).Mag();
+
+  TLorentzVector bmu;
+  Float_t gammabeta;
+  bmu.SetPtEtaPhiM(b_pisa_regression_vec3.Pt(), b_pisa_regression_vec3.Eta(), b_pisa_regression_vec3.Phi(), Bc_MASS);
+  gammabeta = bmu.Gamma() * bmu.Beta();
+  
+  Float_t ctau = pvbv_distance / gammabeta;
+  return (Float_t)(ctau);
 };
 
 #endif
