@@ -18,6 +18,9 @@ OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/Q_squared
 OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/Missing_mass_squared
 OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/Missing_pt
 OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/ctau
+OUTPUTDIR += OutputFiles/TMVAResults/ClosureTest
+OUTPUTDIR += OutputFiles/TMVAResults/ClosureTest/Normalized
+OUTPUTDIR += OutputFiles/TMVAResults/ClosureTest/Normalized/Pass_NNFail_Ratio
 
 #Source and build file extension
 SRCEXT := cpp
@@ -33,7 +36,7 @@ INCLUDES     := $(INCROOT)
 
 #Libraries that has to be linked
 LIBSROOT 	 := $(shell root-config --libs)
-LIBSROOT     += -L/home/pasquale/root/lib -lRooFitCore -lRooFit
+LIBSROOT     += -L/home/pasquale/root/lib -lRooFitCore -lRooFit -lTMVA -lTMVAGui -lXMLIO
 LIBS 	 	 := $(LIBSROOT)
 
 #Sources and objects research
