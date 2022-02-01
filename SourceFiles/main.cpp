@@ -17,6 +17,10 @@
 #include "HeaderFiles/DiscToBePlotted.h"
 #include "HeaderFiles/EfficienciesPlotter.h"
 #include "HeaderFiles/EffToBePlotted.h"
+#include "HeaderFiles/FakeNNClosureTest.h"
+#include "HeaderFiles/FakeNNFactory.h"
+#include "HeaderFiles/FakeNNReader.h"
+#include "HeaderFiles/JPsiReweighting.h"
 #include "HeaderFiles/MarkedNames.h"
 #include "HeaderFiles/NormalizationHybrid.h"
 #include "HeaderFiles/NormalizationJPsi_X.h"
@@ -25,6 +29,7 @@
 #include "HeaderFiles/TMVAMethod.h"
 #include "HeaderFiles/TreeRDFDiscriminants.h"
 #include "HeaderFiles/TreeReader.h"
+#include "HeaderFiles/VarComparer.h"
 #include "HeaderFiles/VarFitter.h"
 #include "HeaderFiles/VarToBeFitted.h"
 #include "HeaderFiles/VarToBePlotted.h"
@@ -38,6 +43,7 @@
 #include <RooPlot.h>
 #include <RooGaussian.h>
 #include <RooDataSet.h>
+#include <RooChi2Var.h>
 #include <RooChebychev.h>
 #include <RooArgusBG.h>
 #include <RooFFTConvPdf.h>
@@ -53,6 +59,8 @@
 #include "TMVA/Reader.h"
 #include <TMVA/TMVAGui.h>
 #include <TMVA/RReader.hxx>
+#include "Blue.h"
+#include <TMatrixD.h>
 
 //It can be useful to use these namespaces
 using namespace std;
@@ -61,39 +69,167 @@ using namespace RooFit;
 int main(int argc, char *argv[])
 {
   gErrorIgnoreLevel = kWarning;
-  /*int colors_palette[3];
+  int colors_palette[3];
   colors_palette[0] = kBlue;
   colors_palette[1] = kGreen + 1;
   colors_palette[2] = kRed;
-  gStyle->SetPalette(3, colors_palette);*/
+  gStyle->SetPalette(3, colors_palette);
   bool debug_bchybridnorm = true;
   bool debug_jpsixnorm = true;
   bool debug_jpsimunorm = true;
   bool debug_inclusive = true;
-  bool debug_fit = true;
+  bool debug_fit = false;
+  string debug_fitclosuretest = "DATA & CT";
   bool debug_peak = true;
-  bool debug_nnfakes = false;
+  bool debug_nnfakes = true;
 
   cout << endl
        << "Program compiled correctly." << endl
        << "Starting now..." << endl
-       << endl;
+       << endl; 
 
+/*
+// S t a r t p r e p a r i n g t h e i n p u t s f o r l a t e r use i n BLUE
+// Numbers o f e s t i m a t e s , u n c e r t a i n t i e s and o b s e r v a b l e 
+  static const Int_t NumEst = 2;
+  static const Int_t NumUnc = 3;
+  static const Int_t NumObs = 1;
+
+// Array of names of estimates (i,j=0,1)
+  static const TString NamEst[NumEst] = {"This Work", "LHCb"};
+
+// Array of names of uncertainties
+  static const TString NamUnc[NumUnc] = {"Stat", "Syst(Correlated)", "Syst(UnCorrelated)"};
+
+// Array of names of observanles
+  static const TString NamObs[NumObs] = {"R(J/#psi)"};
+
+// Array of estimates and uncertainties 
+  static const Int_t LenXEst = NumEst * (NumUnc+1);
+  static const Double_t XEst[LenXEst] = 
+  {0.72, 0.12, 0.125, 0.13, 0.71, 0.17, 0.125, 0.13};
+
+  TMatrixD* InpEst = new TMatrixD(NumEst, NumUnc+1, &XEst[0]);
+
+// Array of statistical precision in systematic uncertainties, copy to matrix
+  static const Int_t LenSUnc = NumEst * NumUnc;
+  static const Double_t SUnc[LenSUnc]={
+  //StatSys1Sys2Sys3Sys4Sys5
+  0., 0., 0.,
+  0., 0., 0.};
+  TMatrixD* InpSta = new TMatrixD(NumEst,NumUnc,&SUnc[0]);
+
+  //Arrayofrho_ijk==constcorrelationsfork<5
+  static const Double_t RhoVal[NumUnc]=
+  {0.0, 0.0, 0.0};
+
+  //Array for correlation matrix for k == 5 with rho_ij5 != const
+  static const Int_t LenInd=NumEst*(NumEst-1)/2;
+  static const Double_t RhoInd[LenInd]={1};
+
+  //FormatsandfilenameforfiguresandLatexfile
+  static const TString ForVal="%5.2f";
+  static const TString ForUnc="%4.2f";
+  static const TString ForWei=ForUnc;
+  static const TString ForRho="%+4.2f";
+  static const TString ForPul=ForUnc;
+  static const TString ForChi=ForUnc;
+  static const TString ForUni="";
+  static const TString FilBas="RJPsi";
+
+  //Axis ranges for Figs.3ab and Fig.6ab
+  static const Double_t XvaMax=0.34,YvaMin=-0.05,YvaMax=0.85;
+  static const Double_t ValMin=0.7,ValMax=0.73;
+  static const Double_t UncMin=0.05,UncMax=0.30;
+  //--EndofpreparationofinputsforBLUE
+
+  //--StartusingBLUE---noinputsbelowthisline---
+  //--Keywords:relatetotheflowchartofthesoftware
+  //Create:callconstructorofBLUEobject
+  Blue* myBlue = new Blue(NumEst,NumUnc);
+
+  //Fill:setdisplayformatsanddefinenames
+  myBlue->SetFormat(ForVal,ForUnc,ForWei,ForRho,ForPul,ForChi,ForUni);
+  myBlue->FillNamEst(&NamEst[0]);
+  myBlue->FillNamUnc(&NamUnc[0]);
+  myBlue->FillNamObs(&NamObs[0]);
+
+  //Fill:insertestimateswiththeiruncertainties
+  myBlue->FillEst(InpEst);
+
+  //Fill:insertstatisticalprecisioninsystematicuncertainties
+  myBlue->FillSta(InpSta);
+
+  //Fill:inserttheestimatorcorrelationsforallsourcesofuncertainty
+  for(Int_t k=0; k<NumUnc; k++)
+  {
+    if(k != (NumUnc-1)) {myBlue->FillCor(k,RhoVal[k]);}
+    else {myBlue->FillCor(-k,&RhoInd[0]);}
+  }
+  //myBlue->FillCor({1,0,0, 0,1,0, 0,0,1});
+
+  //Change:
+  //...alterationswouldgohere
+
+  //Fix:
+  myBlue->FixInp();
+
+  //Combine:
+  myBlue->Solve();
+
+  //Digest:showsomeestimatequantities,preparecodeforFigs.3and4
+  myBlue->PrintEst();
+  myBlue->CorrelPair(0,1,FilBas,-XvaMax,XvaMax,YvaMin,YvaMax);
+  myBlue->DisplayPair(0,1,FilBas);
+
+  //Digest:showsomeobservablequantities,preparecodeforFig.5a
+  myBlue->PrintChiPro();
+  myBlue->DisplayResult(0,FilBas);
+
+  //Digest:writeLatexfile
+  myBlue->LatexResult(FilBas);
+
+  //Free:,Fix:,Combine:solveaccordingtoimportance
+  myBlue->ReleaseInp();
+  myBlue->FixInp();
+  myBlue->SolveAccImp(0, 1);
+
+  //Digest:preparecodeforFig.5b
+  myBlue->DisplayAccImp(0,FilBas);
+
+  //Free:,Fix:,Combine:solvevaryingthesystematicuncertainties
+  myBlue->ReleaseInp();
+  myBlue->FixInp();
+  myBlue->SolveScaSta(1);
+
+  //Digest:produceFig.6
+  myBlue->PrintScaSta(FilBas,ValMin,ValMax,UncMin,UncMax);
+
+  //Delete:deleteobjectaswellaslocalmatricesandreturn
+  delete myBlue; myBlue=NULL;
+  InpEst->Delete();InpEst=NULL;
+  InpSta->Delete();InpSta=NULL;
+*/
   // Input quantities
   // Input files, relative flags (1 for real data, 0 for MC) and a short name (not necessary)
   vector<MarkedNames> filenames;
   filenames.push_back(MarkedNames("output_sig_mix.root", 0, "", "JpsiLeptons_regression"));
   filenames.push_back(MarkedNames("output_bkg.root", 0, "", "Background_regression"));
-  filenames.push_back(MarkedNames("BcToJPsiMuMu_is_jpsi_mu_merged.root", 0, "", "JpsiMuNu"));
-  filenames.push_back(MarkedNames("BcToJPsiMuMu_is_jpsi_tau_merged.root", 0, "", "JpsiTauNu"));
-  filenames.push_back(MarkedNames("BcToJPsiMuMu_is_chic0_mu_merged.root", 0, "", "Chic0"));
+  //filenames.push_back(MarkedNames("data_ptmax_merged.root", 1, "", "Data"));
+  //filenames.push_back(MarkedNames("BcToJPsiMuMu_is_jpsi_mu_merged.root", 0, "", "JpsiMuNu"));
+  //filenames.push_back(MarkedNames("BcToJPsiMuMu_is_jpsi_tau_merged.root", 0, "", "JpsiTauNu"));
+  /*filenames.push_back(MarkedNames("BcToJPsiMuMu_is_chic0_mu_merged.root", 0, "", "Chic0"));
   filenames.push_back(MarkedNames("BcToJPsiMuMu_is_chic1_mu_merged.root", 0, "", "Chic1"));
   filenames.push_back(MarkedNames("BcToJPsiMuMu_is_chic2_mu_merged.root", 0, "", "Chic2"));
   filenames.push_back(MarkedNames("BcToJPsiMuMu_is_jpsi_hc_merged.root", 0, "", "JPsiHC"));
-  //filenames.push_back(MarkedNames("data_ptmax_merged.root", 1, "", "Data"));
+  filenames.push_back(MarkedNames("BcToJPsiMuMu_is_hc_mu_merged.root", 0, "", "hcMu");
+  filenames.push_back(MarkedNames("BcToJPsiMuMu_is_psi2s_tau_merged.root", 0, "", "Psi2STau"));
+  filenames.push_back(MarkedNames("BcToJPsiMuMu_is_psi2s_mu_merged.root", 0, "" "Psi2SMu"));
+  filenames.push_back(MarkedNames("HbToJPsiMuMu_ptmax_merged.root", 0, "", "HbJPsiX"));
+  filenames.push_back(MarkedNames("HbToJPsiMuMu3MuFilter_ptmax_merged.root", 0, "", "HbJPsiMu"));*/
   //filenames.push_back(MarkedNames("BcToJPsiMuMu_is_jpsi_mu_massConstraint.root", 0, "", "JpsiMuNu_Jpsiconstraint"));
   //filenames.push_back(MarkedNames("BcToJPsiMuMu_is_jpsi_tau_massConstraint.root", 0, "", "JpsiTauNu_JPsiconstraint"));
-  //filenames.push_back(MarkedNames("BcToJPsiMuMu_is_jpsi_mu_NONmassConstraint_50bits_precision.root", 0, "", "JpsiMuNu_HighPrecision"));
+  //filenames.push_back(MarkedNames("BcToJPsiMuMu_is_jpsi_mu_NONmassConstraint_20bits_precision.root", 0, "", "JpsiMuNu_HighPrecision"));
   //filenames.push_back(MarkedNames("BcToJPsiMuMu_is_jpsi_mu_massConstraint_12bits_precision.root", 1, "", "JPsiMuNu_12bit_JPsiconstraint"));
   //filenames.push_back(MarkedNames("BcToJPsiMuMu_is_jpsi_mu_massConstraint_14bits_precision.root", 1, "", "JPsiMuNu_14bit_JPsiconstraint"));
   //filenames.push_back(MarkedNames("BcToJPsiMuMu_is_jpsi_mu_massConstraint_16bits_precision.root", 1, "", "JPsiMuNu_16bit_JPsiconstraint"));
@@ -137,7 +273,7 @@ int main(int argc, char *argv[])
  888          888  `88b.   888       o      oo     .d8P  888       o  888       o      `88b    ooo   `88.    .8'       888      
 o888o        o888o  o888o o888ooooood8      8""88888P'  o888ooooood8 o888ooooood8       `Y8bood8P'     `YbodP'        o888o     */
 
-  const char *cuts_preselection_mediumid_true = "mu1pt>3 && "
+  TString cuts_preselection = "mu1pt>3 && "
                                                 "mu2pt>3 && "
                                                 "kpt>2.5 && "
                                                 "abs(mu1eta)<2.5 && "
@@ -147,7 +283,6 @@ o888o        o888o  o888o o888ooooood8      8""88888P'  o888ooooood8 o888ooooood
                                                 "jpsivtx_svprob>1e-2 && "
                                                 "mu1_mediumID>0.5 && "
                                                 "mu2_mediumID>0.5 && "
-                                                "k_mediumID>0.5 && "
                                                 "Bpt_reco>15 && "
                                                 "dr12>0.01 && "
                                                 "dr13>0.01 && "
@@ -161,62 +296,14 @@ o888o        o888o  o888o o888ooooood8      8""88888P'  o888ooooood8 o888ooooood
                                                 "bvtx_cos2D>0.995 && "
                                                 "abs(jpsi_mass-3.0969)<0.1 && "
                                                 "Bmass<10. && "
-                                                "jpsivtx_cos2D>0.99 && "
+                                                "jpsivtx_cos2D>0.99 &&"
                                                 "mu1_isFromMuT>0.5 && "
                                                 "mu2_isFromMuT>0.5 && "
                                                 "mu1_isFromJpsi_MuT>0.5 && "
                                                 "mu2_isFromJpsi_MuT>0.5 && "
                                                 "k_isFromMuT>0.5 ";
 
-  const char *cuts_preselection_mediumid_false = "mu1pt>3 && "
-                                                 "mu2pt>3 && "
-                                                 "kpt>2.5 && "
-                                                 "abs(mu1eta)<2.5 && "
-                                                 "abs(mu2eta)<2.5 && "
-                                                 "abs(keta)<2.5 && "
-                                                 "bvtx_svprob>1e-4 && "
-                                                 "jpsivtx_svprob>1e-2 && "
-                                                 "mu1_mediumID>0.5 && "
-                                                 "mu2_mediumID>0.5 && "
-                                                 "k_mediumID<0.5 && "
-                                                 "Bpt_reco>15 && "
-                                                 "dr12>0.01 && "
-                                                 "dr13>0.01 && "
-                                                 "dr23>0.01 && "
-                                                 "abs(mu1_dz-mu2_dz)<0.2 && "
-                                                 "abs(mu1_dz-k_dz)<0.2 && "
-                                                 "abs(mu2_dz-k_dz)<0.2 && "
-                                                 "abs(k_dxy)<0.05 && "
-                                                 "abs(mu1_dxy)<0.05 && "
-                                                 "abs(mu2_dxy)<0.05 && "
-                                                 "bvtx_cos2D>0.995 && "
-                                                 "abs(jpsi_mass-3.0969)<0.1 && "
-                                                 "Bmass<10. && "
-                                                 "jpsivtx_cos2D>0.99 && "
-                                                 "mu1_isFromMuT>0.5 && "
-                                                 "mu2_isFromMuT>0.5 && "
-                                                 "mu1_isFromJpsi_MuT>0.5 && "
-                                                 "mu2_isFromJpsi_MuT>0.5 && "
-                                                 "k_isFromMuT>0.5 ";
-
-  const char *cuts_final_mediumid_true = "Bmass  <  6.0 && "
-                                         "abs(jpsi_mass - 3.0969) < 0.1 && "
-                                         "mu1pt > 3.5 && "
-                                         "mu2pt > 3.0 && "
-                                         "kpt > 2.5 && "
-                                         "jpsi_pt > 6.7 && "
-                                         "jpsivtx_svprob > 0.005 && "
-                                         "jpsivtx_cos2D > 0.99 && "
-                                         "bvtx_svprob > 0.005 && "
-                                         "bvtx_cos2D > 0.99 && "
-                                         "Bpt_reco > 13.5 && "
-                                         "DR_jpsimu < 0.7 && "
-                                         "-0.006 < ip3d < 0.02 && "
-                                         "mu1_mediumID>0.5 && "
-                                         "mu2_mediumID>0.5 && "
-                                         "k_mediumID>0.5";
-
-  const char *cuts_final_mediumid_false = "Bmass  <  6.0 && "
+  TString cuts_final = "Bmass  <  6.0 && "
                                           "abs(jpsi_mass - 3.0969) < 0.1 && "
                                           "mu1pt > 3.5 && "
                                           "mu2pt > 3.0 && "
@@ -231,54 +318,98 @@ o888o        o888o  o888o o888ooooood8      8""88888P'  o888ooooood8 o888ooooood
                                           "-0.006 < ip3d < 0.02 && "
                                           "mu1_mediumID>0.5 && "
                                           "mu2_mediumID>0.5 && "
-                                          "k_mediumID<0.5";
+                                          "k_mediumID>0.5";
 
+  
+  TString pass_region_definition = "k_mediumID>0.5 && k_raw_db_corr_iso03_rel<0.2";
+  TString fail_region_definition = "k_mediumID>0.5 && k_raw_db_corr_iso03_rel<0.2";
+
+  string cutmedidtrue = (string)(cuts_final+"&&"+cuts_preselection+"&&"+pass_region_definition);
+  string cutmedidfalse = (string)(cuts_final+"&&"+cuts_preselection+"&&"+fail_region_definition);
+  string premedidtrue = (string)(cuts_preselection+"&&"+pass_region_definition);
+  string premedidfalse = (string)(cuts_preselection+"&&"+fail_region_definition);
+/*
+  ooooooooo.                       oooooooooooo  o8o      .   
+  `888   `Y88.                     `888'     `8  `"'    .o8   
+  888   .d88'  .ooooo.   .ooooo.   888         oooo  .o888oo 
+  888ooo88P'  d88' `88b d88' `88b  888oooo8    `888    888   
+  888`88b.    888   888 888   888  888    "     888    888   
+  888  `88b.  888   888 888   888  888          888    888 . 
+  o888o  o888o `Y8bod8P' `Y8bod8P' o888o        o888o   "888"
+*/
+
+  int numberbin_min = 36, numberbin_max = 37;
+  const char *cuts_preselection_pass = (cuts_preselection+"&&"+pass_region_definition).Data();
+  TString cuts_preselection_pass_3mu = cuts_preselection+"&&"+pass_region_definition;
   vector<VarToBeFitted> *vartobefit = new vector<VarToBeFitted>;
   {
-    VarToBeFitted fit_missingmasssquared;
-    fit_missingmasssquared.vartobefitted = "m_miss_sq";
-    fit_missingmasssquared.varname = "m_{miss}^{2}";
-    fit_missingmasssquared.vardimension = "GeV^{2}";
-    fit_missingmasssquared.bins = 25;
-    fit_missingmasssquared.min_bin = 0; fit_missingmasssquared.max_bin = 10;
-    fit_missingmasssquared.legpos = "TR";
-    vartobefit->push_back(fit_missingmasssquared);
+    VarToBeFitted *fit_missingmasssquared;
+    fit_missingmasssquared = new VarToBeFitted;
+    fit_missingmasssquared->vartobefitted = "m_miss_sq";
+    fit_missingmasssquared->varname = "m_{miss}^{2}";
+    fit_missingmasssquared->vardimension = "GeV^{2}";
+    fit_missingmasssquared->min_bin = 0; fit_missingmasssquared->max_bin = 10;
+    fit_missingmasssquared->legpos = "TR";
+    fit_missingmasssquared->legxlength = 0.28;
+    fit_missingmasssquared->cut_mediumid_true = cutmedidtrue;
+    fit_missingmasssquared->cut_mediumid_false = cutmedidfalse;
+    fit_missingmasssquared->preselectioncut_mediumid_true = premedidtrue;
+    fit_missingmasssquared->preselectioncut_mediumid_false = premedidfalse;
+    for (int i = numberbin_min; i<numberbin_max; i++)
+    {
+      fit_missingmasssquared->bins = i;
+      //if (debug_fit == false) VarFitter(fit_missingmasssquared, true, debug_fitclosuretest);
+    }  
   }
   { 
     VarToBeFitted fit_ptmissvec;
     fit_ptmissvec.vartobefitted = "pt_miss_vec";
     fit_ptmissvec.varname = "p_{T,vec}^{miss}";
     fit_ptmissvec.vardimension = "GeV";
-    fit_ptmissvec.bins = 25;
     fit_ptmissvec.min_bin = 0; fit_ptmissvec.max_bin = 30;
     fit_ptmissvec.legpos = "TR";
-    vartobefit->push_back(fit_ptmissvec);
+    fit_ptmissvec.legxlength = 0.28;
+    for (int i = numberbin_min; i<numberbin_max; i++)
+    {
+      fit_ptmissvec.bins = i;
+      //vartobefit->push_back(fit_ptmissvec);
+    }
   }
   {
-    VarToBeFitted fit_qsquared;
-    fit_qsquared.vartobefitted = "Q_sq";
-    fit_qsquared.varname = "Q^{2}";
-    fit_qsquared.vardimension = "GeV^{2}";
-    fit_qsquared.bins = 25;
-    fit_qsquared.min_bin = 3; fit_qsquared.max_bin = 10.5;
-    fit_qsquared.legpos = "TL";
-    vartobefit->push_back(fit_qsquared);
+    VarToBeFitted *fit_qsquared;
+    fit_qsquared = new VarToBeFitted;
+    fit_qsquared->vartobefitted = "Q_sq";
+    fit_qsquared->varname = "Q^{2}";
+    fit_qsquared->vardimension = "GeV^{2}";
+    fit_qsquared->min_bin = 1; fit_qsquared->max_bin = 10.5;
+    fit_qsquared->legpos = "TL";
+    fit_qsquared->legxlength = 0.28;
+    fit_qsquared->cut_mediumid_true = cutmedidtrue;
+    fit_qsquared->cut_mediumid_false = cutmedidfalse;
+    fit_qsquared->preselectioncut_mediumid_true = premedidtrue;
+    fit_qsquared->preselectioncut_mediumid_false = premedidfalse;
+    for (int i = numberbin_min; i<numberbin_max; i++)
+    {
+      fit_qsquared->bins = i;
+      if (debug_fit == false) VarFitter(fit_qsquared, true, debug_fitclosuretest);
+    }
   }
+
   {
     VarToBeFitted fit_emustar;
     fit_emustar.vartobefitted = "E_mu_star";
     fit_emustar.varname = "E_{#mu}^{*}";
     fit_emustar.vardimension = "GeV";
-    fit_emustar.bins = 25;
     fit_emustar.min_bin = 0; fit_emustar.max_bin = 2.5;
     fit_emustar.legpos = "TR";
-    vartobefit->push_back(fit_emustar);
+    fit_emustar.legxlength = 0.28;
+    for (int i = numberbin_min; i<numberbin_max; i++)
+    {
+      fit_emustar.bins = i;
+      //vartobefit->push_back(fit_emustar);
+    }  
   }
-  for (long unsigned int i = 0; i < vartobefit->size(); i++)
-  {
-    vartobefit->at(i).cut_mediumid_true = (string)cuts_final_mediumid_true;
-    vartobefit->at(i).cut_mediumid_false = (string)cuts_final_mediumid_false;
-  }
+
   /*
 oooooooooo.   ooooo  .oooooo..o   .oooooo.   ooooooooo.   ooooo ooo        ooooo ooooo ooooo      ooo       .o.       ooooo      ooo ooooooooooooo  .oooooo..o 
 `888'   `Y8b  `888' d8P'    `Y8  d8P'  `Y8b  `888   `Y88. `888' `88.       .888' `888' `888b.     `8'      .888.      `888b.     `8' 8'   888   `8 d8P'    `Y8 
@@ -823,6 +954,7 @@ o888ooooood8     o888o     o88o     o8888o*/
   eta_resolution_grandmother_beambreco.varname = "eta_resolution_grandmother_beambreco";
   eta_resolution_grandmother_beambreco.varexpression = "mu1_grandmother_eta - eta_breco_beam";
   eta_resolution_grandmother_beambreco.tobeprinted = true;
+  eta_resolution_grandmother_beambreco.tobesquareprinted = true;
   eta_resolution_grandmother_beambreco.plottitle = "#eta_{Grandmother}-#eta_{BeamspotBreco}";
   eta_resolution_grandmother_beambreco.plotxlabel = "#eta_{Grandmother}-#eta_{BeamspotBreco}[]";
   eta_resolution_grandmother_beambreco.xminlim = -1;
@@ -834,6 +966,7 @@ o888ooooood8     o888o     o88o     o8888o*/
   eta_resolution_grandmother_3mumomentareco.varname = "eta_resolution_grandmother_3mumomentareco";
   eta_resolution_grandmother_3mumomentareco.varexpression = "mu1_grandmother_eta - eta_3mumomenta_reco";
   eta_resolution_grandmother_3mumomentareco.tobeprinted = true;
+  eta_resolution_grandmother_3mumomentareco.tobesquareprinted = true;
   eta_resolution_grandmother_3mumomentareco.plottitle = "#eta_{Grandmother}-#eta_{3#mureco}";
   eta_resolution_grandmother_3mumomentareco.plotxlabel = "#eta_{Grandmother}-#eta_{3#mureco}[]";
   eta_resolution_grandmother_3mumomentareco.xminlim = -1;
@@ -985,6 +1118,7 @@ o888ooooood8     o888o     o88o     o8888o*/
   phi_resolution_grandmother_beambreco.varname = "phi_resolution_grandmother_beambreco";
   phi_resolution_grandmother_beambreco.varexpression = "mu1_grandmother_phi - phi_breco_beam";
   phi_resolution_grandmother_beambreco.tobeprinted = true;
+  phi_resolution_grandmother_beambreco.tobesquareprinted = true;
   phi_resolution_grandmother_beambreco.plottitle = "#phi_{Grandmother}-#phi_{BeamspotBreco}";
   phi_resolution_grandmother_beambreco.plotxlabel = "#phi_{Grandmother}-#phi_{BeamspotBreco}[]";
   phi_resolution_grandmother_beambreco.xminlim = -1;
@@ -996,6 +1130,7 @@ o888ooooood8     o888o     o88o     o8888o*/
   phi_resolution_grandmother_3mumomentareco.varname = "phi_resolution_grandmother_3mumomentareco";
   phi_resolution_grandmother_3mumomentareco.varexpression = "mu1_grandmother_phi - phi_3mumomenta_reco";
   phi_resolution_grandmother_3mumomentareco.tobeprinted = true;
+  phi_resolution_grandmother_3mumomentareco.tobesquareprinted = true;
   phi_resolution_grandmother_3mumomentareco.plottitle = "#phi_{Grandmother}-#phi_{3#mureco}";
   phi_resolution_grandmother_3mumomentareco.plotxlabel = "#phi_{Grandmother}-#phi_{3#mureco}[]";
   phi_resolution_grandmother_3mumomentareco.xminlim = -1;
@@ -1210,41 +1345,48 @@ o888ooooood8 o888o        o888o        o888o  `Y8bood8P'  o888o o888ooooood8 o8o
   DiscToBePlotted Q2_Gene_disc;
   Q2_Gene_disc.discriminantvariable = "Q2";
   Q2_Gene_disc.discriminantname = "Q2_Gene";
-  Q2_Gene_disc.discriminantlabel = "Q^{2}_{Gene}";
+  Q2_Gene_disc.discriminantprettyname = "Q2_Gen";
+  Q2_Gene_disc.discriminantlabel = "Q^{2}_{Gen}";
   Q2_Gene_disc.discriminantdimension = "GeV^{2}";
   Q2_Gene_disc.discriminantbins = 100;
-  Q2_Gene_disc.discriminantmin = -10;
+  Q2_Gene_disc.discriminantmin = -5;
   Q2_Gene_disc.discriminantmax = 11;
   Q2_Gene_disc.flag_rocplot = false;
   Q2_Gene_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/Q_squared";
+  Q2_Gene_disc.legxlength = 0.28;
   discriminantsefficienciestobeplotted->push_back(Q2_Gene_disc);
 
   DiscToBePlotted Q2_Pisa_disc;
   Q2_Pisa_disc.discriminantvariable = "Q2";
   Q2_Pisa_disc.discriminantname = "Q2_Pisa";
-  Q2_Pisa_disc.discriminantlabel = "Q^{2}_{Pisa}";
+  Q2_Pisa_disc.discriminantprettyname = "Q2_Vertices";
+  Q2_Pisa_disc.discriminantlabel = "Q^{2}_{Vertices}";
   Q2_Pisa_disc.discriminantdimension = "GeV^{2}";
   Q2_Pisa_disc.discriminantbins = 100;
-  Q2_Pisa_disc.discriminantmin = -10;
+  Q2_Pisa_disc.discriminantmin = -5;
   Q2_Pisa_disc.discriminantmax = 11;
   Q2_Pisa_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/Q_squared";
+  Q2_Pisa_disc.legxlength = 0.28;
   discriminantsefficienciestobeplotted->push_back(Q2_Pisa_disc);
 
   DiscToBePlotted Q2_Jona_disc;
   Q2_Jona_disc.discriminantvariable = "Q2";
   Q2_Jona_disc.discriminantname = "Q2_Jona";
-  Q2_Jona_disc.discriminantlabel = "Q^{2}_{Jona}";
+  Q2_Jona_disc.discriminantprettyname = "Q2_Collinear";
+  Q2_Jona_disc.discriminantlabel = "Q^{2}_{Collinear}";
   Q2_Jona_disc.discriminantdimension = "GeV^{2}";
   Q2_Jona_disc.discriminantbins = 100;
-  Q2_Jona_disc.discriminantmin = -10;
+  Q2_Jona_disc.discriminantmin = -5;
   Q2_Jona_disc.discriminantmax = 11;
   Q2_Jona_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/Q_squared";
+  Q2_Jona_disc.legxlength = 0.28;
   discriminantsefficienciestobeplotted->push_back(Q2_Jona_disc);
-
+/*
   DiscToBePlotted Q2_regression_Pisa_disc;
   Q2_regression_Pisa_disc.discriminantvariable = "Q2_regression";
   Q2_regression_Pisa_disc.discriminantname = "Q2_Pisa_regression";
-  Q2_regression_Pisa_disc.discriminantlabel = "Q^{2}_{Regression-Pisa}";
+  Q2_regression_Pisa_disc.discriminantprettyname = "Q2_Pisa_regression";
+  Q2_regression_Pisa_disc.discriminantlabel = "Q^{2}_{Regression-Vertices}";
   Q2_regression_Pisa_disc.discriminantdimension = "GeV^{2}";
   Q2_regression_Pisa_disc.discriminantbins = 100;
   Q2_regression_Pisa_disc.discriminantmin = -10;
@@ -1255,52 +1397,60 @@ o888ooooood8 o888o        o888o        o888o  `Y8bood8P'  o888o o888ooooood8 o8o
   DiscToBePlotted Q2_regression_Jona_disc;
   Q2_regression_Jona_disc.discriminantvariable = "Q2_regression";
   Q2_regression_Jona_disc.discriminantname = "Q2_Jona_regression";
-  Q2_regression_Jona_disc.discriminantlabel = "Q^{2}_{Regression-Jona}";
+  Q2_regression_Jona_disc.discriminantprettyname = "Q2_Jona_regression";
+  Q2_regression_Jona_disc.discriminantlabel = "Q^{2}_{Regression-Collinear}";
   Q2_regression_Jona_disc.discriminantdimension = "GeV^{2}";
   Q2_regression_Jona_disc.discriminantbins = 100;
   Q2_regression_Jona_disc.discriminantmin = -10;
   Q2_regression_Jona_disc.discriminantmax = 11;
   Q2_regression_Jona_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/Q_squared";
   discriminantsefficienciestobeplotted->push_back(Q2_regression_Jona_disc);
-
+*/
   DiscToBePlotted MissingM2_Gene_disc;
   MissingM2_Gene_disc.discriminantvariable = "MissingM2";
   MissingM2_Gene_disc.discriminantname = "MissingM2_Gene";
-  MissingM2_Gene_disc.discriminantlabel = "m^{2}_{Miss,Gene}";
+  MissingM2_Gene_disc.discriminantprettyname = "MissingM2_Gen";
+  MissingM2_Gene_disc.discriminantlabel = "m^{2}_{Miss,Gen}";
   MissingM2_Gene_disc.discriminantdimension = "GeV^{2}";
   MissingM2_Gene_disc.discriminantbins = 100;
   MissingM2_Gene_disc.discriminantmin = -10;
   MissingM2_Gene_disc.discriminantmax = 11;
   MissingM2_Gene_disc.flag_rocplot = false;
   MissingM2_Gene_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/Missing_mass_squared";
+  MissingM2_Gene_disc.legxlength = 0.37;
   discriminantsefficienciestobeplotted->push_back(MissingM2_Gene_disc);
 
   DiscToBePlotted MissingM2_Pisa_disc;
   MissingM2_Pisa_disc.discriminantvariable = "MissingM2";
   MissingM2_Pisa_disc.discriminantname = "MissingM2_Pisa";
-  MissingM2_Pisa_disc.discriminantlabel = "m^{2}_{Miss,Pisa}";
+  MissingM2_Pisa_disc.discriminantprettyname = "MissingM2_Vertices";
+  MissingM2_Pisa_disc.discriminantlabel = "m^{2}_{Miss,Vertices}";
   MissingM2_Pisa_disc.discriminantdimension = "GeV^{2}";
   MissingM2_Pisa_disc.discriminantbins = 100;
   MissingM2_Pisa_disc.discriminantmin = -10;
   MissingM2_Pisa_disc.discriminantmax = 11;
   MissingM2_Pisa_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/Missing_mass_squared";
+  MissingM2_Pisa_disc.legxlength = 0.37;
   discriminantsefficienciestobeplotted->push_back(MissingM2_Pisa_disc);
 
   DiscToBePlotted MissingM2_Jona_disc;
   MissingM2_Jona_disc.discriminantvariable = "MissingM2";
   MissingM2_Jona_disc.discriminantname = "MissingM2_Jona";
-  MissingM2_Jona_disc.discriminantlabel = "m^{2}_{Miss,Jona}";
+  MissingM2_Jona_disc.discriminantprettyname = "MissingM2_Collinear";
+  MissingM2_Jona_disc.discriminantlabel = "m^{2}_{Miss,Collinear}";
   MissingM2_Jona_disc.discriminantdimension = "GeV^{2}";
   MissingM2_Jona_disc.discriminantbins = 100;
   MissingM2_Jona_disc.discriminantmin = -10;
   MissingM2_Jona_disc.discriminantmax = 11;
   MissingM2_Jona_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/Missing_mass_squared";
+  MissingM2_Jona_disc.legxlength = 0.37;
   discriminantsefficienciestobeplotted->push_back(MissingM2_Jona_disc);
-
+/*
   DiscToBePlotted MissingM2_Pisa_regression_disc;
   MissingM2_Pisa_regression_disc.discriminantvariable = "MissingM2_regression";
   MissingM2_Pisa_regression_disc.discriminantname = "MissingM2_Pisa_regression";
-  MissingM2_Pisa_regression_disc.discriminantlabel = "m^{2}_{Miss,Pisa}";
+  MissingM2_Pisa_regression_disc.discriminantprettyname = "MissingM2_Pisa_regression";
+  MissingM2_Pisa_regression_disc.discriminantlabel = "m^{2}_{Miss,Vertices}";
   MissingM2_Pisa_regression_disc.discriminantdimension = "GeV^{2}";
   MissingM2_Pisa_regression_disc.discriminantbins = 100;
   MissingM2_Pisa_regression_disc.discriminantmin = -10;
@@ -1311,52 +1461,63 @@ o888ooooood8 o888o        o888o        o888o  `Y8bood8P'  o888o o888ooooood8 o8o
   DiscToBePlotted MissingM2_Jona_regression_disc;
   MissingM2_Jona_regression_disc.discriminantvariable = "MissingM2_regression";
   MissingM2_Jona_regression_disc.discriminantname = "MissingM2_Jona_regression";
-  MissingM2_Jona_regression_disc.discriminantlabel = "m^{2}_{Miss,Jona}";
+  MissingM2_Jona_regression_disc.discriminantprettyname = "MissingM2_Jona_regression";
+  MissingM2_Jona_regression_disc.discriminantlabel = "m^{2}_{Miss,Collinear}";
   MissingM2_Jona_regression_disc.discriminantdimension = "GeV^{2}";
   MissingM2_Jona_regression_disc.discriminantbins = 100;
   MissingM2_Jona_regression_disc.discriminantmin = -10;
   MissingM2_Jona_regression_disc.discriminantmax = 11;
   MissingM2_Jona_regression_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/Missing_mass_squared";
   discriminantsefficienciestobeplotted->push_back(MissingM2_Jona_regression_disc);
-
+*/
   DiscToBePlotted MissingPt_Gene_disc;
   MissingPt_Gene_disc.discriminantvariable = "MissingPt";
   MissingPt_Gene_disc.discriminantname = "MissingPt_Gene";
-  MissingPt_Gene_disc.discriminantlabel = "p^{miss}_{T,Gene}";
+  MissingPt_Gene_disc.discriminantprettyname = "MissingPt_Gen";
+  MissingPt_Gene_disc.discriminantlabel = "p^{miss}_{T,Gen}";
   MissingPt_Gene_disc.discriminantdimension = "GeV";
   MissingPt_Gene_disc.discriminantbins = 100;
   MissingPt_Gene_disc.discriminantmin = -10;
-  MissingPt_Gene_disc.discriminantmax = 70;
+  MissingPt_Gene_disc.discriminantmax = 30;
   MissingPt_Gene_disc.flag_rocplot = false;
   MissingPt_Gene_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/Missing_pt";
+  MissingPt_Gene_disc.legpos = "TR";
+  MissingPt_Gene_disc.legxlength = 0.37;
   discriminantsefficienciestobeplotted->push_back(MissingPt_Gene_disc);
 
   DiscToBePlotted MissingPt_Pisa_disc;
   MissingPt_Pisa_disc.discriminantvariable = "MissingPt";
   MissingPt_Pisa_disc.discriminantname = "MissingPt_Pisa";
-  MissingPt_Pisa_disc.discriminantlabel = "p^{miss}_{T,Pisa}";
+  MissingPt_Pisa_disc.discriminantprettyname = "MissingPt_Vertices";
+  MissingPt_Pisa_disc.discriminantlabel = "p^{miss}_{T,Vertices}";
   MissingPt_Pisa_disc.discriminantdimension = "GeV";
   MissingPt_Pisa_disc.discriminantbins = 100;
   MissingPt_Pisa_disc.discriminantmin = -10;
-  MissingPt_Pisa_disc.discriminantmax = 70;
+  MissingPt_Pisa_disc.discriminantmax = 30;
   MissingPt_Pisa_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/Missing_pt";
+  MissingPt_Pisa_disc.legpos = "TR";
+  MissingPt_Pisa_disc.legxlength = 0.37;
   discriminantsefficienciestobeplotted->push_back(MissingPt_Pisa_disc);
 
   DiscToBePlotted MissingPt_Jona_disc;
   MissingPt_Jona_disc.discriminantvariable = "MissingPt";
   MissingPt_Jona_disc.discriminantname = "MissingPt_Jona";
-  MissingPt_Jona_disc.discriminantlabel = "p^{miss}_{T,Jona}";
+  MissingPt_Jona_disc.discriminantprettyname = "MissingPt_Collinear";
+  MissingPt_Jona_disc.discriminantlabel = "p^{miss}_{T,Collinear}";
   MissingPt_Jona_disc.discriminantdimension = "GeV";
   MissingPt_Jona_disc.discriminantbins = 100;
   MissingPt_Jona_disc.discriminantmin = -10;
-  MissingPt_Jona_disc.discriminantmax = 70;
+  MissingPt_Jona_disc.discriminantmax = 30;
   MissingPt_Jona_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/Missing_pt";
+  MissingPt_Jona_disc.legpos = "TR";
+  MissingPt_Jona_disc.legxlength = 0.37;
   discriminantsefficienciestobeplotted->push_back(MissingPt_Jona_disc);
-
+/*
   DiscToBePlotted MissingPt_Pisa_regression_disc;
   MissingPt_Pisa_regression_disc.discriminantvariable = "MissingPt_regression";
   MissingPt_Pisa_regression_disc.discriminantname = "MissingPt_Pisa_regression";
-  MissingPt_Pisa_regression_disc.discriminantlabel = "p^{miss}_{T,Pisa}";
+  MissingPt_Pisa_regression_disc.discriminantprettyname = "MissingPt_Pisa_regression";
+  MissingPt_Pisa_regression_disc.discriminantlabel = "p^{miss}_{T,Vertices}";
   MissingPt_Pisa_regression_disc.discriminantdimension = "GeV";
   MissingPt_Pisa_regression_disc.discriminantbins = 100;
   MissingPt_Pisa_regression_disc.discriminantmin = -10;
@@ -1367,56 +1528,67 @@ o888ooooood8 o888o        o888o        o888o  `Y8bood8P'  o888o o888ooooood8 o8o
   DiscToBePlotted MissingPt_Jona_regression_disc;
   MissingPt_Jona_regression_disc.discriminantvariable = "MissingPt_regression";
   MissingPt_Jona_regression_disc.discriminantname = "MissingPt_Jona_regression";
-  MissingPt_Jona_regression_disc.discriminantlabel = "p^{miss}_{T,Jona}";
+  MissingPt_Jona_regression_disc.discriminantprettyname = "MissingPt_Jona_regression";
+  MissingPt_Jona_regression_disc.discriminantlabel = "p^{miss}_{T,Collinear}";
   MissingPt_Jona_regression_disc.discriminantdimension = "GeV";
   MissingPt_Jona_regression_disc.discriminantbins = 100;
   MissingPt_Jona_regression_disc.discriminantmin = -10;
   MissingPt_Jona_regression_disc.discriminantmax = 50;
   MissingPt_Jona_regression_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/Missing_pt";
   discriminantsefficienciestobeplotted->push_back(MissingPt_Jona_regression_disc);
-
+*/
   DiscToBePlotted ctau_Gene_disc;
   ctau_Gene_disc.discriminantvariable = "ctau";
   ctau_Gene_disc.discriminantname = "ctau_Gene";
-  ctau_Gene_disc.discriminantlabel = "c#tau_{Gene}";
+  ctau_Gene_disc.discriminantprettyname = "ctau_Gen";
+  ctau_Gene_disc.discriminantlabel = "c#tau_{Gen}";
   ctau_Gene_disc.discriminantdimension = "mm";
   ctau_Gene_disc.discriminantbins = 100;
   ctau_Gene_disc.discriminantmin = 0;
-  ctau_Gene_disc.discriminantmax = 0.16;
+  ctau_Gene_disc.discriminantmax = 0.1;
   ctau_Gene_disc.distributionplotlegend = new TLegend(0.72, 0.81, 0.9, 0.9);
   ctau_Gene_disc.flag_rocplot = false;
   ctau_Gene_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/ctau";
+  ctau_Gene_disc.legpos = "TR";
+  ctau_Gene_disc.legxlength = 0.28;
   discriminantsefficienciestobeplotted->push_back(ctau_Gene_disc);
 
   DiscToBePlotted ctau_Pisa_disc;
   ctau_Pisa_disc.discriminantvariable = "ctau";
   ctau_Pisa_disc.discriminantname = "ctau_Pisa";
-  ctau_Pisa_disc.discriminantlabel = "c#tau_{Pisa}";
+  ctau_Pisa_disc.discriminantprettyname = "ctau_Vertices";
+  ctau_Pisa_disc.discriminantlabel = "c#tau_{Vertices}";
   ctau_Pisa_disc.discriminantdimension = "mm";
   ctau_Pisa_disc.discriminantbins = 100;
   ctau_Pisa_disc.discriminantmin = 0;
-  ctau_Pisa_disc.discriminantmax = 0.16;
+  ctau_Pisa_disc.discriminantmax = 0.1;
   ctau_Pisa_disc.distributionplotlegend = new TLegend(0.72, 0.81, 0.9, 0.9);
   ctau_Pisa_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/ctau";
+  ctau_Pisa_disc.legpos = "TR";
+  ctau_Pisa_disc.legxlength = 0.28;
   discriminantsefficienciestobeplotted->push_back(ctau_Pisa_disc);
 
   DiscToBePlotted ctau_Jona_disc;
   ctau_Jona_disc.discriminantvariable = "ctau";
   ctau_Jona_disc.discriminantname = "ctau_Jona";
-  ctau_Jona_disc.discriminantlabel = "c#tau_{Jona}";
+  ctau_Jona_disc.discriminantprettyname = "ctau_Collinear";
+  ctau_Jona_disc.discriminantlabel = "c#tau_{Collinear}";
   ctau_Jona_disc.discriminantdimension = "mm";
   ctau_Jona_disc.discriminantbins = 100;
   ctau_Jona_disc.discriminantmin = 0;
   ctau_Jona_disc.discriminantmax = 0.1;
   ctau_Jona_disc.distributionplotlegend = new TLegend(0.72, 0.81, 0.9, 0.9);
-  ctau_Jona_disc.distributionlogscale = 1;
+  //ctau_Jona_disc.distributionlogscale = 1;
   ctau_Jona_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/ctau";
+  ctau_Jona_disc.legpos = "TR";
+  ctau_Jona_disc.legxlength = 0.28;
   discriminantsefficienciestobeplotted->push_back(ctau_Jona_disc);
 
   DiscToBePlotted ctau_Pisa_regression_disc;
   ctau_Pisa_regression_disc.discriminantvariable = "ctau_regression";
   ctau_Pisa_regression_disc.discriminantname = "ctau_Pisa_regression";
-  ctau_Pisa_regression_disc.discriminantlabel = "c#tau_{Pisa}";
+  ctau_Pisa_regression_disc.discriminantprettyname = "ctau_Vertices_regression";
+  ctau_Pisa_regression_disc.discriminantlabel = "c#tau_{Vertices}";
   ctau_Pisa_regression_disc.discriminantdimension = "mm";
   ctau_Pisa_regression_disc.discriminantbins = 100;
   ctau_Pisa_regression_disc.discriminantmin = 0;
@@ -1428,7 +1600,8 @@ o888ooooood8 o888o        o888o        o888o  `Y8bood8P'  o888o o888ooooood8 o8o
   DiscToBePlotted ctau_Jona_regression_disc;
   ctau_Jona_regression_disc.discriminantvariable = "ctau_regression";
   ctau_Jona_regression_disc.discriminantname = "ctau_Jona_regression";
-  ctau_Jona_regression_disc.discriminantlabel = "c#tau_{Jona}";
+  ctau_Jona_regression_disc.discriminantprettyname = "ctau_Collinear_regression";
+  ctau_Jona_regression_disc.discriminantlabel = "c#tau_{Collinear}";
   ctau_Jona_regression_disc.discriminantdimension = "mm";
   ctau_Jona_regression_disc.discriminantbins = 100;
   ctau_Jona_regression_disc.discriminantmin = 0;
@@ -1436,8 +1609,8 @@ o888ooooood8 o888o        o888o        o888o  `Y8bood8P'  o888o o888ooooood8 o8o
   ctau_Jona_regression_disc.distributionplotlegend = new TLegend(0.72, 0.81, 0.9, 0.9);
   ctau_Jona_regression_disc.output_directory_png = "OutputFiles/PNGPlots/Efficiencies/ctau";
   discriminantsefficienciestobeplotted->push_back(ctau_Jona_regression_disc);
-
-  /*  TreeRDFDiscriminants(filenames, treenames, branchnames, discriminants, cuts_preselection_mediumid_true, false);
+/*
+  TreeRDFDiscriminants(filenames, treenames, branchnames, discriminants, cuts_preselection.Data(), false);
 
   vector<const char *> *var2bestored = new vector<const char *>;
   var2bestored->push_back("Q2_Gene_regression");
@@ -1453,7 +1626,7 @@ o888ooooood8 o888o        o888o        o888o  `Y8bood8P'  o888o o888ooooood8 o8o
   var2bestored->push_back("ctau_Pisa_regression");
   var2bestored->push_back("ctau_Jona_regression");
 
-  DiscriminantsPlotter(filenames, treenames, var2bestored, vartobeplotted, false);
+  //DiscriminantsPlotter(filenames, treenames, var2bestored, vartobeplotted, false);
 
   unordered_map<string, pair<string, string>> data_holder;
 
@@ -1461,9 +1634,9 @@ o888ooooood8 o888o        o888o        o888o  `Y8bood8P'  o888o o888ooooood8 o8o
   data_holder["Normalization"] = pair("ManipulatedVariables.root", "JpsiLeptons_regression_BTo3Mu_normal");
   data_holder["Signorm"] = pair("ManipulatedVariables.root", "JpsiLeptons_regression_BTo3Mu");
   data_holder["Background"] = pair("ManipulatedVariables.root", "Background_regression_BTo3Mu");
-  EfficienciesPlotter(data_holder, discriminantsefficienciestobeplotted);*/
-
-  /*
+  EfficienciesPlotter(data_holder, discriminantsefficienciestobeplotted);
+*/
+/*
 ooooo      ooo   .oooooo.   ooooooooo.   ooo        ooooo       .o.       ooooo        ooooo  oooooooooooo       .o.       ooooooooooooo ooooo   .oooooo.   ooooo      ooo 
 `888b.     `8'  d8P'  `Y8b  `888   `Y88. `88.       .888'      .888.      `888'        `888' d'""""""d888'      .888.      8'   888   `8 `888'  d8P'  `Y8b  `888b.     `8' 
  8 `88b.    8  888      888  888   .d88'  888b     d'888      .8"888.      888          888        .888P       .8"888.          888       888  888      888  8 `88b.    8  
@@ -1473,9 +1646,9 @@ ooooo      ooo   .oooooo.   ooooooooo.   ooo        ooooo       .o.       ooooo 
 o8o        `8   `Y8bood8P'  o888o  o888o o8o        o888o o88o     o8888o o888ooooood8 o888o .8888888888P  o88o     o8888o     o888o     o888o  `Y8bood8P'  o8o        `8
 */
 
-  NormalizationHybrid(debug_bchybridnorm);
-  NormalizationJPsiX(debug_jpsixnorm);
-  NormalizationJPsiMu(cuts_preselection_mediumid_true, debug_jpsimunorm);
+  if (debug_bchybridnorm == false) NormalizationHybrid(debug_bchybridnorm);
+  if (debug_jpsixnorm == false) NormalizationJPsiX(debug_jpsixnorm);
+  if (debug_jpsimunorm == false) NormalizationJPsiMu(cuts_preselection_pass_3mu, debug_jpsimunorm);
 
   /*
 ooooo                       oooo                        o8o                        
@@ -1506,31 +1679,31 @@ o888o o888o o888o `Y8bod8P' o888o  `V88V"V8P' 8""888P' o888o     `8'     `Y8bod8
 
     // Building variable distribution for various contributions
     // MC
-    TH1F *histogram_jpsimumu_is_JPsiTau = (TH1F *)BtoJpsiMuMu_is_JPsiTau.Filter(cuts_preselection_mediumid_true).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_jpsi_tau", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
+    TH1F *histogram_jpsimumu_is_JPsiTau = (TH1F *)BtoJpsiMuMu_is_JPsiTau.Filter(cuts_preselection_pass).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_jpsi_tau", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
     histogram_jpsimumu_is_JPsiTau->Sumw2();
-    TH1F *histogram_jpsimumu_is_JPsiMu = (TH1F *)BtoJpsiMuMu_is_JPsiMu.Filter(cuts_preselection_mediumid_true).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_jpsi_mu", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
+    TH1F *histogram_jpsimumu_is_JPsiMu = (TH1F *)BtoJpsiMuMu_is_JPsiMu.Filter(cuts_preselection_pass).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_jpsi_mu", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
     histogram_jpsimumu_is_JPsiMu->Sumw2();
-    TH1F *histogram_jpsimumu_is_chic0 = (TH1F *)BtoJpsiMuMu_is_Chic0.Filter(cuts_preselection_mediumid_true).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_chic0", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
+    TH1F *histogram_jpsimumu_is_chic0 = (TH1F *)BtoJpsiMuMu_is_Chic0.Filter(cuts_preselection_pass).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_chic0", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
     histogram_jpsimumu_is_chic0->Sumw2();
-    TH1F *histogram_jpsimumu_is_chic1 = (TH1F *)BtoJpsiMuMu_is_Chic1.Filter(cuts_preselection_mediumid_true).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_chic1", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
+    TH1F *histogram_jpsimumu_is_chic1 = (TH1F *)BtoJpsiMuMu_is_Chic1.Filter(cuts_preselection_pass).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_chic1", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
     histogram_jpsimumu_is_chic1->Sumw2();
-    TH1F *histogram_jpsimumu_is_chic2 = (TH1F *)BtoJpsiMuMu_is_Chic2.Filter(cuts_preselection_mediumid_true).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_chic2", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
+    TH1F *histogram_jpsimumu_is_chic2 = (TH1F *)BtoJpsiMuMu_is_Chic2.Filter(cuts_preselection_pass).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_chic2", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
     histogram_jpsimumu_is_chic2->Sumw2();
-    TH1F *histogram_jpsimumu_is_JPsiHC = (TH1F *)BtoJpsiMuMu_is_JPsiHC.Filter(cuts_preselection_mediumid_true).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_jpsi_hc", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
+    TH1F *histogram_jpsimumu_is_JPsiHC = (TH1F *)BtoJpsiMuMu_is_JPsiHC.Filter(cuts_preselection_pass).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_jpsi_hc", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
     histogram_jpsimumu_is_JPsiHC->Sumw2();
-    TH1F *histogram_jpsimumu_is_Hc = (TH1F *)BtoJpsiMuMu_is_Hc.Filter(cuts_preselection_mediumid_true).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_hc", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
+    TH1F *histogram_jpsimumu_is_Hc = (TH1F *)BtoJpsiMuMu_is_Hc.Filter(cuts_preselection_pass).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_hc", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
     histogram_jpsimumu_is_Hc->Sumw2();
-    TH1F *histogram_jpsimumu_is_Psi2stau = (TH1F *)BtoJpsiMuMu_is_Psi2stau.Filter(cuts_preselection_mediumid_true).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_psi2s_tau", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
+    TH1F *histogram_jpsimumu_is_Psi2stau = (TH1F *)BtoJpsiMuMu_is_Psi2stau.Filter(cuts_preselection_pass).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_psi2s_tau", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
     histogram_jpsimumu_is_Psi2stau->Sumw2();
-    TH1F *histogram_jpsimumu_is_Psi2smu = (TH1F *)BtoJpsiMuMu_is_Psi2smu.Filter(cuts_preselection_mediumid_true).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_psi2s_mu", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
+    TH1F *histogram_jpsimumu_is_Psi2smu = (TH1F *)BtoJpsiMuMu_is_Psi2smu.Filter(cuts_preselection_pass).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_psi2s_mu", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
     histogram_jpsimumu_is_Psi2smu->Sumw2();
-    TH1F *histogram_hbtojpsix = (TH1F *)HbToJpsiX.Filter(cuts_preselection_mediumid_true)
+    TH1F *histogram_hbtojpsix = (TH1F *)HbToJpsiX.Filter(cuts_preselection_pass)
                                     .Filter("abs(mu1_grandmother_pdgId) != 541 && abs(mu2_grandmother_pdgId) != 541")
                                     .Filter("abs(k_pdgId) == 13")
                                     .Fill<Float_t>(TH1F("pt_miss_hb_jpsix", "y", 50, 0, 30), {"m_miss_sq"})
                                     ->Clone();
     histogram_hbtojpsix->Sumw2();
-    TH1F *histogram_hbtojpsimu = (TH1F *)HbToJPsiMu.Filter(cuts_preselection_mediumid_true)
+    TH1F *histogram_hbtojpsimu = (TH1F *)HbToJPsiMu.Filter(cuts_preselection_pass)
                                      .Filter("abs(mu1_grandmother_pdgId) != 541 && abs(mu2_grandmother_pdgId) != 541")
                                      .Filter("abs(k_pdgId) == 13")
                                      .Fill<Float_t>(TH1F("pt_miss_hb_jpsimu", "y", 50, 0, 30), {"m_miss_sq"})
@@ -1538,7 +1711,7 @@ o888o o888o o888o `Y8bod8P' o888o  `V88V"V8P' 8""888P' o888o     `8'     `Y8bod8
     histogram_hbtojpsimu->Sumw2();
 
     // Data
-    TH1F *histogram_data = (TH1F *)BtoMu_data.Filter(cuts_preselection_mediumid_true).Fill<Float_t>(TH1F("m_miss_sq_data", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
+    TH1F *histogram_data = (TH1F *)BtoMu_data.Filter(cuts_preselection_pass).Fill<Float_t>(TH1F("m_miss_sq_data", "y", 50, 0, 30), {"m_miss_sq"})->Clone();
     histogram_data->Sumw2();
 
     // Fakes
@@ -1687,19 +1860,6 @@ o888o o888o o888o `Y8bod8P' o888o  `V88V"V8P' 8""888P' o888o     `8'     `Y8bod8
     inclusive_canvas->Clear();
     legend->Clear();
   }
-  /*
-ooooooooo.                       oooooooooooo  o8o      .   
-`888   `Y88.                     `888'     `8  `"'    .o8   
- 888   .d88'  .ooooo.   .ooooo.   888         oooo  .o888oo 
- 888ooo88P'  d88' `88b d88' `88b  888oooo8    `888    888   
- 888`88b.    888   888 888   888  888    "     888    888   
- 888  `88b.  888   888 888   888  888          888    888 . 
-o888o  o888o `Y8bod8P' `Y8bod8P' o888o        o888o   "888"
-*/
-  if (debug_fit == false)
-  {
-    VarFitter(vartobefit);
-  }
 
   /*
  oooooooooooo oooooooooooo ooooooooo.     .oooooo.   ooooooooo.   oooooooooooo       .o.       oooo    oooo 
@@ -1716,16 +1876,16 @@ d'""""""d888' `888'     `8 `888   `Y88.  d8P'  `Y8b  `888   `Y88. `888'     `8  
     Double_t nbins = 100, minbin = -0.01, maxbin = 0.02;
     Int_t n_events_tobeshown = 1000;
     char zero_peak_filter[1500];
-    strcpy(zero_peak_filter, cuts_preselection_mediumid_true);
+    strcpy(zero_peak_filter, cuts_preselection+"&&"+pass_region_definition);
     strcat(zero_peak_filter, "& m_miss_sq < 0.02");
 
     // Building variable distribution for various contributions
     // MC Signal and normalizaton
     ROOT::RDataFrame BtoJpsiMuMu_is_JPsiTau("BTo3Mu", "InputFiles/BcToJPsiMuMu_is_jpsi_tau_merged.root");
     ROOT::RDataFrame BtoJpsiMuMu_is_JPsiMu("BTo3Mu", "InputFiles/BcToJPsiMuMu_is_jpsi_mu_merged.root");
-    TH1F *histogram_jpsimumu_is_JPsiTau = (TH1F *)BtoJpsiMuMu_is_JPsiTau.Filter(cuts_preselection_mediumid_true).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_jpsi_tau", "y", nbins, minbin, maxbin), {"m_miss_sq"})->Clone();
+    TH1F *histogram_jpsimumu_is_JPsiTau = (TH1F *)BtoJpsiMuMu_is_JPsiTau.Filter(cuts_preselection_pass).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_jpsi_tau", "y", nbins, minbin, maxbin), {"m_miss_sq"})->Clone();
     histogram_jpsimumu_is_JPsiTau->Sumw2();
-    TH1F *histogram_jpsimumu_is_JPsiMu = (TH1F *)BtoJpsiMuMu_is_JPsiMu.Filter(cuts_preselection_mediumid_true).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_jpsi_mu", "y", nbins, minbin, maxbin), {"m_miss_sq"})->Clone();
+    TH1F *histogram_jpsimumu_is_JPsiMu = (TH1F *)BtoJpsiMuMu_is_JPsiMu.Filter(cuts_preselection_pass).Fill<Float_t>(TH1F("pt_miss_jpsimu_is_jpsi_mu", "y", nbins, minbin, maxbin), {"m_miss_sq"})->Clone();
     histogram_jpsimumu_is_JPsiMu->Sumw2();
 
     // MC Background: Build-up and sum of the components
@@ -1805,7 +1965,7 @@ d'""""""d888' `888'     `8 `888   `Y88.  d8P'  `Y8b  `888   `Y88. `888'     `8  
 
     // Data
     ROOT::RDataFrame BtoMu_data("BTo3Mu", "InputFiles/data_ptmax_merged.root");
-    TH1F *histogram_data = (TH1F *)BtoMu_data.Filter(cuts_preselection_mediumid_true).Fill<Float_t>(TH1F("m_miss_sq_data", "y", nbins, minbin, maxbin), {"m_miss_sq"})->Clone();
+    TH1F *histogram_data = (TH1F *)BtoMu_data.Filter(cuts_preselection_pass).Fill<Float_t>(TH1F("m_miss_sq_data", "y", nbins, minbin, maxbin), {"m_miss_sq"})->Clone();
     histogram_data->Sumw2();
 
     TCanvas peakzero_canvas("peakzero_canvas", "peakzero_canvas", 1360, 768);
@@ -1872,10 +2032,18 @@ d'""""""d888' `888'     `8 `888   `Y88.  d8P'  `Y8b  `888   `Y88. `888'     `8  
                 ->AsString()
          << endl;
   }
-
+  /*
+    oooooooooooo           oooo                  
+    888'     `8           `888                  
+    888          .oooo.    888  oooo   .ooooo.  
+    888oooo8    `P  )88b   888 .8P'   d88' `88b 
+    888    "     .oP"888   888888.    888ooo888 
+    888         d8(  888   888 `88b.  888    .o 
+    o888o        Y888""8o o888o o888o `Y8bod8P'
+  */
   if (debug_nnfakes == false)
   {
-    const char *preselection = "mu1pt>4 &&"
+    TString     preselection = "mu1pt>4 &&"
                                "mu2pt>4 &&"
                                "kpt>2.5 &&"
                                "abs(mu1eta)<2.5 &&"
@@ -1903,16 +2071,11 @@ d'""""""d888' `888'     `8 `888   `Y88.  d8P'  `Y8b  `888   `Y88. `888'     `8  
                                "k_isFromMuT>0.5";
 
     const char *pass_id = "k_mediumID>0.5 && k_raw_db_corr_iso03_rel<0.2";
-    //pass_id = "k_mediumID>0.5";
-    //pass_id = "k_tightID>0.5";
     const char *fail_id = "!(k_mediumID>0.5 && k_raw_db_corr_iso03_rel<0.2)";
-    //fail_id = "!(k_mediumID>0.5) & !(k_raw_db_corr_iso03_rel<0.2)";
 
-    TString preselection_mc = TString::Format("%s && !(abs(k_genpdgId)==13)", preselection);
-
-    //Hb to jpsi X MC sample
-    const char *mc_path = "InputFiles/HbToJPsiMuMu_ptmax_merged.root";
-
+    TString preselection_mc = TString::Format("%s && !(abs(k_genpdgId)==13)", preselection.Data());
+    TString finalselection_mc = (string)(cuts_final+"&& !(abs(k_genpdgId)==13)");
+    
     vector<string> features = {
         "kpt",
         "keta",
@@ -1933,78 +2096,12 @@ d'""""""d888' `888'     `8 `888   `Y88.  d8P'  `Y8b  `888   `Y88. `888'     `8  
         //'Bpt_reco'
     };
 
-    //preselection and not-true muon request
-    ROOT::RDataFrame mc("BTo3Mu", mc_path);
-    auto mc_filtered = ROOT::RDF::RNode(mc.Filter(preselection_mc.Data()));
-    auto passing_mc_tmp = mc_filtered.Filter(pass_id);
-    auto failing_mc_tmp = mc_filtered.Filter(fail_id);
-
-    Float_t closure_test_threshold = 0.7;
-    auto passing_mc = passing_mc_tmp.Range(0, int(passing_mc_tmp.Count().GetValue() * closure_test_threshold));
-    auto failing_mc = failing_mc_tmp.Range(0, int(failing_mc_tmp.Count().GetValue() * closure_test_threshold));
-
-    //samples for the closure test
-    auto passing_mc_ct = passing_mc_tmp.Range(int(passing_mc_tmp.Count().GetValue() * closure_test_threshold), 0).Define("Target", "return 1");
-    auto failing_mc_ct = failing_mc_tmp.Range(int(failing_mc_tmp.Count().GetValue() * closure_test_threshold), 0).Define("Target", "return 0");
-
-    cout << "" << endl;
-    cout << "Model" << endl;
-    cout << "" << endl;
-
-    string MVA_PassFakes_Input_Tree = "Pass_events", MVA_FailFakes_Input_Tree = "Fail_events";
-    string MVA_ClosurePassFakes_Input_Tree = "ClosurePass_events", MVA_ClosureFailFakes_Input_Tree = "ClosureFail_events";
-    string MVA_Fakes_Input_File = "MVA_Fakes_Input", MVA_Fakes_Output_File = "MVA_Fakes_Output";
-    TString infilename(TString::Format("%s.root", MVA_Fakes_Input_File.data()));
-    TString outfilename(TString::Format("%s.root", MVA_Fakes_Output_File.data()));
-    ROOT::RDF::RSnapshotOptions tmva_mc_snapop;
-    tmva_mc_snapop.fMode = "RECREATE";
-    passing_mc.Snapshot(MVA_PassFakes_Input_Tree, infilename, features, tmva_mc_snapop);
-    tmva_mc_snapop.fMode = "UPDATE";
-    failing_mc.Snapshot(MVA_FailFakes_Input_Tree, infilename, features, tmva_mc_snapop);
-    vector<string> features_ct = features;
-    features_ct.push_back("Target");
-    for (vector<VarToBeFitted>::iterator varit = vartobefit->begin(); varit < vartobefit->end(); varit++)
-      if (passing_mc_ct.HasColumn(varit->vartobefitted) == true)
-        features_ct.push_back(varit->vartobefitted);
-    passing_mc_ct.Snapshot(MVA_ClosurePassFakes_Input_Tree, infilename, features_ct, tmva_mc_snapop);
-    failing_mc_ct.Snapshot(MVA_ClosureFailFakes_Input_Tree, infilename, features_ct, tmva_mc_snapop);
-    TFile *inputfile = TFile::Open(infilename, "read");
-    TFile *outputfile = TFile::Open(outfilename, "recreate");
-    TTree *signal = (TTree *)inputfile->Get(MVA_PassFakes_Input_Tree.data());
-    TTree *background = (TTree *)inputfile->Get(MVA_FailFakes_Input_Tree.data());
-    Double_t signalweight = 1.0, backgroundweight = 1.0;
-    TMVA::gConfig().GetIONames().fWeightFileDirPrefix = "TMVAResults";
-    TMVA::gConfig().GetIONames().fWeightFileDir = "Weights";
-    TMVA::DataLoader *loader = new TMVA::DataLoader("");
-    TMVA::Factory *factory = new TMVA::Factory("TMVAClassification", outputfile, "AnalysisType=Classification");
-    for (vector<string>::iterator mvavar = features.begin(); mvavar < features.end(); mvavar++)
-    {
-      loader->AddVariable(mvavar->data(), mvavar->data(), "", 'signal->GetBranch(mvavar->data())->GetClassName()');
-    }
-    loader->AddSignalTree(signal, signalweight);
-    loader->AddBackgroundTree(background, backgroundweight);
-
-    Float_t train_test_treshold = 0.9;
-    long unsigned int ntrainsign = signal->GetEntries()*train_test_treshold; /*!< Number of events used to train signal identification in the sample */
-    long unsigned int ntrainback = background->GetEntries()*train_test_treshold; /*!< Number of events used to train background identification in the sample */
-    long unsigned int ntestsign = signal->GetEntries()*(1-train_test_treshold);  /*!< Number of events used to test signal identification in the sample */
-    long unsigned int ntestback = background->GetEntries()*(1-train_test_treshold);  /*!< Number of events used to test background identification in the sample */
-    TString dataString = TString::Format("nTrain_Signal=%lu", ntrainsign);
-    dataString.Append(TString::Format(":nTrain_Background=%lu", ntrainback));
-    dataString.Append(TString::Format(":nTest_Signal=%lu", ntestsign));
-    dataString.Append(TString::Format(":nTest_Background=%lu", ntestback));
-    dataString.Append(":SplitMode=Random:NormMode=NumEvents:!V");
-    loader->PrepareTrainingAndTestTree("", "", dataString);
-    TMVA::DataLoader *loader_with_variance_threshold = loader->VarTransform("VT(0.0)");
-    //loader_with_variance_threshold->SetName("FakeReweighting");
-    cout << loader_with_variance_threshold->GetName() << endl;
-
     vector<TMVAMethod> tmvamethods;
     {
       TMVAMethod kmlp1;
       kmlp1.tmvamethodname = "kmlp1";
-      TString config  = "CreateMVAPdfs:VarTransform=N:NCycles=1000:HiddenLayers=N+2,N+1,N:NeuronType=sigmoid:EstimatorType=CE:";
-              config += "TrainingMethod=BP:LearningRate=0.2:DecayRate=0.1:ConvergenceTests=10";
+      TString config  = "CreateMVAPdfs:VarTransform=N:NCycles=10000:HiddenLayers=N+2,N+1,N:NeuronType=sigmoid:EstimatorType=CE:";
+              config += "TrainingMethod=BP:LearningRate=0.1:DecayRate=0.05:ConvergenceTests=50";
       kmlp1.tmvamethodconfiguration = config;
       kmlp1.tmvamethodtype = TMVA::Types::EMVA::kMLP;
       tmvamethods.push_back(kmlp1);
@@ -2041,367 +2138,193 @@ d'""""""d888' `888'     `8 `888   `Y88.  d8P'  `Y8b  `888   `Y88. `888'     `8  
       kbdt1.tmvamethodtype = TMVA::Types::EMVA::kBDT;
       //tmvamethods.push_back(kbdt1);
     }
-    for (vector<TMVAMethod>::iterator tmvamethit = tmvamethods.begin(); tmvamethit < tmvamethods.end(); tmvamethit++)
-    {
-      factory->BookMethod(loader_with_variance_threshold, tmvamethit->tmvamethodtype, tmvamethit->tmvamethodname, tmvamethit->tmvamethodconfiguration);
-    }
-    factory->TrainAllMethods();
-    factory->TestAllMethods();
-    factory->EvaluateAllMethods();
-    inputfile->Close();
-    outputfile->Close();
-    if(!gROOT->IsBatch()) TMVA::TMVAGui(outfilename);
+
+    vector<string> *fake_factory_names = new vector<string>; /*!< 0 = fake mc path, 1-2= in/out file, 3-4= pass/fail trees, 5-6 pass/fail closure test trees*/
+    const char *mc_path = "InputFiles/HbToJPsiMuMu_ptmax_merged.root"; 
+    fake_factory_names->push_back(mc_path);
+    string MVA_Fakes_Input_File = "MVA_Fakes_Input.root";
+    fake_factory_names->push_back(MVA_Fakes_Input_File);
+    string MVA_Fakes_Output_File = "MVA_Fakes_Output.root";
+    fake_factory_names->push_back(MVA_Fakes_Output_File);
+    string MVA_PassFakes_Input_Tree = "Pass_events";
+    fake_factory_names->push_back(MVA_PassFakes_Input_Tree);
+    string MVA_FailFakes_Input_Tree = "Fail_events";
+    fake_factory_names->push_back(MVA_FailFakes_Input_Tree);
+    string MVA_ClosurePassFakes_Input_Tree = "ClosurePass_events";
+    fake_factory_names->push_back(MVA_ClosurePassFakes_Input_Tree);
+    string MVA_ClosureFailFakes_Input_Tree = "ClosureFail_events";
+    fake_factory_names->push_back(MVA_ClosureFailFakes_Input_Tree);
+    FakeNNFactory(finalselection_mc, fake_factory_names, pass_id, features, vartobefit, tmvamethods);
 
     // Initializing variables to set up the reader
     vector<Float_t> Input_feature_var(features.size());
     unordered_map<string, Float_t> MVA_feature_var(features.size());
-    if (1 > 0)
-    {
-      TFile *eventinputfile = TFile::Open(infilename.Data(), "update");
-      TFile *eventoutputfile = TFile::Open(TString::Format("risultatidechenonsisa.root"), "recreate");
-      TList *list = new TList();
-      TTree *PassFakesTree = (TTree *)eventinputfile->Get(MVA_ClosurePassFakes_Input_Tree.data());
-      TTree *FailFakesTree = (TTree *)eventinputfile->Get(MVA_ClosureFailFakes_Input_Tree.data());
-      Double_t passentries = PassFakesTree->GetEntries(), failentries = FailFakesTree->GetEntries();
-      cout <<  passentries << endl;
-      cout <<  failentries << endl;
-      Double_t fractionsignal = passentries/(passentries+failentries); 
-      cout << fractionsignal << endl;
-      list->Add(PassFakesTree);
-      list->Add(FailFakesTree);
-      TTree *Event = TTree::MergeTrees(list);
-      Double_t FakeWeight = 0, FakeProba = 0, FakeRarity = 0;
-      TBranch *Branch_FakeWeight = Event->Branch("FakeWeight", &FakeWeight, "FakeWeight/D");
-      TBranch *Branch_FakeProba = Event->Branch("FakeProba", &FakeProba, "FakeProba/D");
-      TBranch *Branch_FakeRarity = Event->Branch("FakeRarity", &FakeRarity, "FakeRarity/D");
-      int event_entries = Event->GetEntries();
-      for (vector<string>::iterator mvavar = features.begin(); mvavar < features.end(); mvavar++)
-        Event->SetBranchAddress(mvavar->data(), &(Input_feature_var[distance(features.begin(), mvavar)]));
-
-      //Creating a dataframe which holds only names of variables with a variance greater than the threshold set up before
-      TString loader_with_variance_threshold_filename = TString::Format("%s.root", MVA_Fakes_Output_File.data());
-      TString loader_with_variance_threshold_treename = TString::Format("%s/TrainTree", loader_with_variance_threshold->GetName());
-      ROOT::RDataFrame loader_with_variance_threshold_dataframe(loader_with_variance_threshold_treename, loader_with_variance_threshold_filename);
-
-      for (vector<TMVAMethod>::iterator tmvamethit = tmvamethods.begin(); tmvamethit < tmvamethods.end(); tmvamethit++)
-      {
-        cout << endl << endl << endl << endl;
-        Event->SetName(TString::Format("FakeClosureTest_%s", tmvamethit->tmvamethodname));
-
-        //Looking for any weight of the specified method in the folder containing the training results
-        TString weightfilename = TString::Format("TMVAResults/%s/Weights/TMVAClassification_%s.weights.xml", loader_with_variance_threshold->GetName(), tmvamethit->tmvamethodname);
-
-        //Defining the reader that should do the MVA evaluation
-        TMVA::Reader *reader = new TMVA::Reader(tmvamethit->tmvamethodname);
-        for (vector<string>::iterator mvavar = features.begin(); mvavar < features.end(); mvavar++)
-        {
-          if (loader_with_variance_threshold_dataframe.HasColumn(mvavar->data()))
-          {
-            reader->AddVariable(mvavar->data(), &(MVA_feature_var[mvavar->data()]));
-          }
-        }
-        reader->BookMVA(tmvamethit->tmvamethodname, weightfilename);
-
-        //Checking that input tree is read from the right file, because histograms are written to a different file
-        eventinputfile->cd();
-        for (int readerindex = 0; readerindex < event_entries; readerindex++)
-        {
-          Event->GetEntry(readerindex);
-          for (vector<string>::iterator mvavar = features.begin(); mvavar < features.end(); mvavar++)
-          {
-            MVA_feature_var[mvavar->data()] = (Float_t)Input_feature_var[distance(features.begin(), mvavar)];
-          }
-          FakeWeight = reader->EvaluateMVA(tmvamethit->tmvamethodname);
-          FakeProba = reader->GetProba(tmvamethit->tmvamethodname);
-          FakeRarity = reader->GetRarity(tmvamethit->tmvamethodname);
-          Branch_FakeWeight->Fill();
-          Branch_FakeProba->Fill();
-          Branch_FakeRarity->Fill();
-        }
-
-        //Freeing memory allocated for the reader
-        delete reader;
-        eventoutputfile->cd();
-        Event->Write();
-      }
-      delete list;
-      eventinputfile->Close();
-      eventoutputfile->Close();
-    }
-    if (1 > 0)
-    {
-      TFile *eventinputfile = TFile::Open(TString::Format("InputFiles/BcToJPsiMuMu_is_jpsi_mu_merged.root"), "read");
-      TTree *Event_old = (TTree *)eventinputfile->Get("BTo3Mu");
-      TFile *eventoutputfile = TFile::Open(TString::Format("OutputFiles/BcToJPsiMuMu_is_jpsi_mu_merged.root"), "recreate");
-      TTree *Event = Event_old->CloneTree();
-      Double_t FakeWeight = 0, FakeProba = 0, FakeRarity = 0;
-      TBranch *Branch_FakeWeight = Event->Branch("FakeWeight", &FakeWeight, "FakeWeight/D");
-      TBranch *Branch_FakeProba = Event->Branch("FakeProba", &FakeProba, "FakeProba/D");
-      TBranch *Branch_FakeRarity = Event->Branch("FakeRarity", &FakeRarity, "FakeRarity/D");
-      int event_entries = Event->GetEntries();
-      for (vector<string>::iterator mvavar = features.begin(); mvavar < features.end(); mvavar++)
-        Event->SetBranchAddress(mvavar->data(), &(Input_feature_var[distance(features.begin(), mvavar)]));
-
-      //Creating a dataframe which holds only names of variables with a variance greater than the threshold set up before
-      TString loader_with_variance_threshold_filename = TString::Format("%s.root", MVA_Fakes_Output_File.data());
-      TString loader_with_variance_threshold_treename = TString::Format("%s/TrainTree", loader_with_variance_threshold->GetName());
-      ROOT::RDataFrame loader_with_variance_threshold_dataframe(loader_with_variance_threshold_treename, loader_with_variance_threshold_filename);
-
-      for (vector<TMVAMethod>::iterator tmvamethit = tmvamethods.begin(); tmvamethit < tmvamethods.end(); tmvamethit++)
-      {
-        cout << event_entries << endl << endl << endl << endl;
-        //Event->SetName(TString::Format("", tmvamethit->tmvamethodname));
-
-        //Looking for any weight of the specified method in the folder containing the training results
-        TString weightfilename = TString::Format("TMVAResults/%s/Weights/TMVAClassification_%s.weights.xml", loader_with_variance_threshold->GetName(), tmvamethit->tmvamethodname);
-
-        //Defining the reader that should do the MVA evaluation
-        TMVA::Reader *reader = new TMVA::Reader(tmvamethit->tmvamethodname);
-        for (vector<string>::iterator mvavar = features.begin(); mvavar < features.end(); mvavar++)
-        {
-          if (loader_with_variance_threshold_dataframe.HasColumn(mvavar->data()))
-          {
-            reader->AddVariable(mvavar->data(), &(MVA_feature_var[mvavar->data()]));
-          }
-        }
-        reader->BookMVA(tmvamethit->tmvamethodname, weightfilename);
-
-        //Checking that input tree is read from the right file, because histograms are written to a different file
-        eventinputfile->cd();
-        for (int readerindex = 0; readerindex < event_entries; readerindex++)
-        {
-          Event->GetEntry(readerindex);
-          for (vector<string>::iterator mvavar = features.begin(); mvavar < features.end(); mvavar++)
-          {
-            MVA_feature_var[mvavar->data()] = (Float_t)Input_feature_var[distance(features.begin(), mvavar)];
-          }
-          FakeWeight = reader->EvaluateMVA(tmvamethit->tmvamethodname);
-          FakeProba = reader->GetProba(tmvamethit->tmvamethodname);
-          FakeRarity = reader->GetRarity(tmvamethit->tmvamethodname);
-          Branch_FakeWeight->Fill();
-          Branch_FakeProba->Fill();
-          Branch_FakeRarity->Fill();
-        }
-
-        //Freeing memory allocated for the reader
-        delete reader;
-        eventoutputfile->cd();
-        Event->Write();
-        eventinputfile->Close();
-        eventoutputfile->Close();
-      }
-    }
-
-    vector<string> nn_weighted_variables;
-    for (vector<TMVAMethod>::iterator tmvamethitct = tmvamethods.begin(); tmvamethitct < tmvamethods.end(); tmvamethitct++)
-    {
-      TString weightfilename = TString::Format("TMVAResults/%s/Weights/TMVAClassification_%s.weights.xml", loader_with_variance_threshold->GetName(), tmvamethitct->tmvamethodname);
-      TMVA::Experimental::RReader model(weightfilename.Data());
-      auto variables = model.GetVariableNames();
-      //auto prediction = model.Compute();
-
-      ROOT::RDataFrame NN_Closure_original(TString::Format("FakeClosureTest_%s", tmvamethitct->tmvamethodname), "risultatidechenonsisa.root");
-      auto NN_Closure = NN_Closure_original.Define("Weight", "FakeProba/(1-FakeProba)");
-      TString filter = "Target==0";
-      //        filter+= "Target==0" ;
-      for (vector<VarToBeFitted>::iterator nn_varit = vartobefit->begin(); nn_varit < vartobefit->end(); nn_varit++)
-      {
-        TString failvarname = TString::Format("FailEvents_%s_%s", tmvamethitct->tmvamethodname, nn_varit->vartobefitted);
-        TString passvarname = TString::Format("PassEvents_%s_%s", tmvamethitct->tmvamethodname, nn_varit->vartobefitted);
-        TString weightedvarname = TString::Format("WeightedEvents_%s_%s", tmvamethitct->tmvamethodname, nn_varit->vartobefitted);
-        TString closure_canvas_name = TString::Format("histogram_closure_%s_%s", nn_varit->vartobefitted, tmvamethitct->tmvamethodname);
-        TString closure_canvas_filename = TString::Format("OutputFiles/TMVAResults/ClosureTest/histogram_closure_%s_%s.png", nn_varit->vartobefitted, tmvamethitct->tmvamethodname);
-        TString closure_canvas_norm_name = TString::Format("%s_norm", closure_canvas_name.Data());
-        TString closure_canvas_norm_filename = TString::Format("OutputFiles/TMVAResults/ClosureTest/Normalized/histogram_closure_%s_%s_norm.png", nn_varit->vartobefitted, tmvamethitct->tmvamethodname);
-        TString closure_canvas_norm_ratio_name = TString::Format("%s_ratio", closure_canvas_norm_name.Data());
-        TString closure_canvas_norm_ratio_filename = TString::Format("OutputFiles/TMVAResults/ClosureTest/Normalized/Pass_NNFail_Ratio/histogram_closure_%s_%s_norm_ratio.png", nn_varit->vartobefitted, tmvamethitct->tmvamethodname);
-        TString closurestackname = TString::Format("Closurestackname_%s_%s", tmvamethitct->tmvamethodname, nn_varit->vartobefitted);
-
-        TH1F *histogram_closure_fail = (TH1F*)NN_Closure.Filter("Target==0").Histo1D<Float_t>({failvarname, failvarname, int(nn_varit->bins), nn_varit->min_bin, nn_varit->max_bin}, nn_varit->vartobefitted)->Clone();
-        TH1F *histogram_closure_pass = (TH1F*)NN_Closure.Filter("Target==1").Histo1D<Float_t>({passvarname, passvarname, int(nn_varit->bins), nn_varit->min_bin, nn_varit->max_bin}, nn_varit->vartobefitted)->Clone();
-        TH1F *histogram_closure_weighted = (TH1F *)NN_Closure.Filter(filter.Data()).Histo1D<Float_t, Double_t>({weightedvarname, weightedvarname, int(nn_varit->bins), nn_varit->min_bin, nn_varit->max_bin}, nn_varit->vartobefitted, "Weight")->Clone();
-        //TH1F *histogram_closure_weighted = (TH1F *)NN_Closure.Filter(filter.Data()).Histo1D<Float_t>({weightedvarname, weightedvarname, int(nn_varit->bins), nn_varit->min_bin, nn_varit->max_bin}, nn_varit->vartobefitted)->Clone();
-
-        histogram_closure_weighted->SetTitle(TString::Format("%s distribution for pass/fail region", nn_varit->varname.data()));
-        histogram_closure_weighted->GetXaxis()->SetTitle(nn_varit->Xlabel());
-        histogram_closure_weighted->GetYaxis()->SetTitle("Norm. Occ. [a.u.]");
-
-        TCanvas *closure_canvas = new TCanvas(closure_canvas_name, closure_canvas_name, 1920, 1080);
-        THStack *closure_histstack = new THStack(closurestackname, closurestackname);
-        histogram_closure_weighted->SetMarkerColor(kBlue);
-        histogram_closure_weighted->SetLineColor(kBlue);
-        histogram_closure_weighted->SetLineWidth(3);
-        histogram_closure_weighted->SetStats(kFALSE);
-        closure_histstack->Add(histogram_closure_weighted);
-        histogram_closure_pass->SetMarkerColor(kRed);
-        histogram_closure_pass->SetLineColor(kRed);
-        histogram_closure_pass->SetLineWidth(3);
-        histogram_closure_pass->SetStats(kFALSE);
-        closure_histstack->Add(histogram_closure_pass);
-        histogram_closure_fail->SetMarkerColor(kYellow + 1);
-        histogram_closure_fail->SetLineColor(kYellow + 1);
-        histogram_closure_fail->SetLineWidth(3);
-        histogram_closure_fail->SetStats(kFALSE);
-        closure_histstack->Add(histogram_closure_fail);
-        closure_histstack->Draw("NOSTACK HIST");
-        closure_histstack->SetNameTitle(TString::Format("%s distribution for pass/fail region", nn_varit->varname.data()), TString::Format("%s distribution for pass/fail region", nn_varit->varname.data()));
-        closure_histstack->GetHistogram()->GetXaxis()->SetTitle(nn_varit->Xlabel());
-        closure_histstack->GetHistogram()->GetYaxis()->SetTitle("Occurences");
-
-        TLegend legend = nn_varit->SetLegendPos(0.1, 0.3, 0.75, 0.9);
-        legend.AddEntry(histogram_closure_fail, "Fail Events");
-        legend.AddEntry(histogram_closure_weighted, "Fail Events (with NN weights)");
-        legend.AddEntry(histogram_closure_pass, "Pass Events");
-        legend.AddEntry((TObject *)0, TString::Format("Fail region entries: %.0f", histogram_closure_fail->GetEntries()), "");
-        legend.AddEntry((TObject *)0, TString::Format("Events passing the NN cut: %.0f", histogram_closure_weighted->GetEntries()), "");
-        legend.AddEntry((TObject *)0, TString::Format("Pass region entries: %.0f", histogram_closure_pass->GetEntries()), "");
-        legend.SetTextSize(0.019);
-        legend.SetBorderSize(1);
-        legend.SetFillColor(kWhite);
-        legend.Draw("SAME");
-        closure_canvas->Print(closure_canvas_filename);
-
-        //Drawing histogram normalized
-        TH1F *histogram_closure_fail_norm = (TH1F*)histogram_closure_fail->Clone(TString::Format("%s_norm",histogram_closure_fail->GetName()));
-        TH1F *histogram_closure_pass_norm = (TH1F*)histogram_closure_pass->Clone(TString::Format("%s_norm",histogram_closure_pass->GetName()));
-        TH1F *histogram_closure_weighted_norm = (TH1F*)histogram_closure_weighted->Clone(TString::Format("%s_norm",histogram_closure_weighted->GetName()));
-
-        TCanvas *closure_norm_canvas = new TCanvas(closure_canvas_norm_name, closure_canvas_norm_name, 1920, 1080);
-        THStack *closure_norm_histstack = new THStack(closurestackname, closurestackname);
-        THStack *closure_norm_histstack_ratio = new THStack(TString::Format("%s_ratio", closurestackname.Data()).Data(), TString::Format("%s_ratio", closurestackname.Data()));
-        histogram_closure_weighted_norm->Scale(1./histogram_closure_weighted->Integral());
-        closure_norm_histstack->Add(histogram_closure_weighted_norm);
-        closure_norm_histstack_ratio->Add(histogram_closure_weighted_norm);
-        histogram_closure_pass_norm->Scale(1./histogram_closure_pass->Integral());
-        closure_norm_histstack->Add(histogram_closure_pass_norm);
-        closure_norm_histstack_ratio->Add(histogram_closure_pass_norm);
-        histogram_closure_fail_norm->Scale(1./histogram_closure_fail->Integral());
-        closure_norm_histstack->Add(histogram_closure_fail_norm);
-        closure_norm_histstack->Draw("NOSTACK HIST");
-        closure_norm_histstack->SetNameTitle(TString::Format("%s normalized distribution for pass/fail region", nn_varit->varname.data()), TString::Format("%s normalized distribution for pass/fail region", nn_varit->varname.data()));
-        closure_norm_histstack->GetHistogram()->GetXaxis()->SetTitle(nn_varit->Xlabel());
-        closure_norm_histstack->GetHistogram()->GetYaxis()->SetTitle("Norm. Occ. [a.u.]");
-
-        TLegend legend_norm = nn_varit->SetLegendPos(0.1, 0.33, 0.75, 0.9);
-        legend_norm.AddEntry(histogram_closure_fail_norm, "Fail Events");
-        legend_norm.AddEntry(histogram_closure_weighted_norm, "Fail Events (with NN weights)");
-        legend_norm.AddEntry(histogram_closure_pass_norm, "Pass Events");
-        legend_norm.SetTextSize(0.02);
-        legend_norm.SetBorderSize(1);
-        legend_norm.SetFillColor(kWhite);
-
-        //Kolmogorov test
-        TH1F *histogram_closure_ratio_fail_pass = (TH1F*)histogram_closure_fail_norm->Clone();
-        TH1F *histogram_closure_ratio_pass_pass = (TH1F*)histogram_closure_pass_norm->Clone();
-        TH1F *histogram_closure_ratio_weighted_pass = (TH1F*)histogram_closure_weighted_norm->Clone();
-        histogram_closure_ratio_fail_pass->Divide(histogram_closure_fail_norm, histogram_closure_pass_norm);
-        histogram_closure_ratio_pass_pass->Divide(histogram_closure_pass_norm, histogram_closure_pass_norm);
-        histogram_closure_ratio_weighted_pass->Divide(histogram_closure_weighted_norm, histogram_closure_pass_norm);
-        Double_t kolmogorov_fail_pass = histogram_closure_ratio_fail_pass->KolmogorovTest(histogram_closure_ratio_pass_pass);
-        Double_t kolmogorov_weight_pass = histogram_closure_ratio_weighted_pass->KolmogorovTest(histogram_closure_ratio_pass_pass);
-        cout << "Kolmogorov Fail-Pass" << kolmogorov_fail_pass << endl;
-        cout << "Kolmogorov Weight-Pass" << kolmogorov_weight_pass << endl;
-        legend_norm.AddEntry((TObject *)0, TString::Format("Kolmogorov test Fail-Pass: %.3f", kolmogorov_fail_pass), "");
-        legend_norm.AddEntry((TObject *)0, TString::Format("Kolmogorov test Faill(NN)-Pass: %.3f", kolmogorov_weight_pass), "");
-        legend_norm.Draw("SAME");      
-        closure_norm_canvas->Print(closure_canvas_norm_filename);
-
-        //Plot with ratio
-        TCanvas *closure_norm_ratio_canvas = new TCanvas(closure_canvas_norm_ratio_name.Data(), closure_canvas_norm_ratio_name.Data(), 1920, 1080);
-        TPad *closure_norm_pad = new TPad(TString::Format("%s%s", closure_canvas_norm_ratio_name.Data(), nn_varit->varname.data()), TString::Format("%s%s", closure_canvas_norm_ratio_name.Data(), nn_varit->varname.data()), 0.0, 0.3, 1, 1);
-        TPad *closure_norm_ratio_pad = new TPad(TString::Format("%s_ratio_%s", closure_canvas_norm_ratio_name.Data(), nn_varit->varname.data()), TString::Format("%s_ratio_%s", closure_canvas_norm_ratio_name.Data(), nn_varit->varname.data()), 0.0, 0.0, 1, 0.3);
-        closure_norm_ratio_canvas->cd(0);
-        closure_norm_ratio_canvas->Clear();
-        closure_norm_ratio_canvas->Draw();
-        closure_norm_pad->SetTopMargin(0.1);
-        closure_norm_pad->SetBottomMargin(0.015);
-        closure_norm_pad->SetBorderMode(0);
-        closure_norm_pad->SetLeftMargin(0.1);
-        closure_norm_ratio_pad->SetTopMargin(0.00);
-        closure_norm_ratio_pad->SetBottomMargin(0.2);
-        closure_norm_ratio_pad->SetBorderMode(0);
-        closure_norm_ratio_pad->SetLeftMargin(0.1);
-        gStyle->SetOptTitle(kFALSE);
-        closure_norm_pad->Draw();
-        closure_norm_ratio_pad->Draw();
-
-        closure_norm_pad->cd();
-        closure_norm_histstack_ratio->Draw("NOSTACK HIST");
-        closure_norm_histstack_ratio->SetNameTitle(TString::Format("%s normalized distribution for pass/fail region", nn_varit->varname.data()), TString::Format("%s normalized distribution for pass/fail region", nn_varit->varname.data()));
-        closure_norm_histstack_ratio->GetHistogram()->GetXaxis()->SetTitle(nn_varit->Xlabel());
-        closure_norm_histstack_ratio->GetHistogram()->GetYaxis()->SetTitle("Norm. Occ. [a.u.]");
-        closure_norm_histstack_ratio->GetHistogram()->GetXaxis()->SetLabelSize(0);
-        closure_norm_histstack_ratio->SetMaximum(closure_norm_histstack_ratio->GetHistogram()->GetMaximum()*1.1);
-        closure_norm_histstack_ratio->Draw("NOSTACK HIST");
-        //closure_norm_histstack_ratio->GetYaxis()->SetTitleSize(0.1);
-        //closure_norm_histstack_ratio->GetYaxis()->SetTitleOffset(0.4);
-
-        TLegend leg_fitwithratio = nn_varit->SetLegendPosAuto(nn_varit->legpos, 3);
-        leg_fitwithratio.SetTextFont(42);
-        leg_fitwithratio.AddEntry(histogram_closure_weighted_norm, "Fail Events (with NN weights)");
-        leg_fitwithratio.AddEntry(histogram_closure_pass_norm, "Pass Events");
-        leg_fitwithratio.AddEntry((TObject *)0, TString::Format("Kolmogorov test Faill(NN)-Pass: %.3f", kolmogorov_weight_pass), "");
-        leg_fitwithratio.SetTextSize(0.02);
-        leg_fitwithratio.SetBorderSize(1);
-        leg_fitwithratio.SetFillColor(kWhite);
-        leg_fitwithratio.Draw("SAME");        
-        gPad->SetLogy(0);
-
-        closure_norm_ratio_pad->cd();
-        TH1F *closure_pass_failnn_ratio = new TH1F();
-        closure_pass_failnn_ratio = (TH1F *)histogram_closure_pass_norm->Clone();
-        closure_pass_failnn_ratio->Divide(closure_pass_failnn_ratio, histogram_closure_weighted_norm);
-        closure_pass_failnn_ratio->SetStats(false);
-        closure_pass_failnn_ratio->SetStats(false);
-
-        //Fitting residuals with a line
-        closure_pass_failnn_ratio->Fit("pol0");
-        TF1 *linearfit = closure_pass_failnn_ratio->GetFunction("pol0");
-        linearfit->SetName("linearfit");
-        linearfit->SetLineColor(kGreen+1);
-        linearfit->SetLineWidth(4);
-        closure_pass_failnn_ratio->Draw("M");
-
-        //Adding fit results to legend
-        closure_norm_pad->cd();
-        Float_t legendpositionx1ndc = leg_fitwithratio.GetX1(), legendpositionx2ndc = leg_fitwithratio.GetX2(),
-                legendpositiony1ndc = leg_fitwithratio.GetY1()-0.04*4, legendpositiony2ndc = leg_fitwithratio.GetY1();
-        TPaveText *pt = new TPaveText(legendpositionx1ndc, legendpositiony1ndc, legendpositionx2ndc, legendpositiony2ndc, "NDC");
-        //pt->SetTextAlign(11);
-        pt->SetTextFont(42);
-        pt->SetTextSize(0.02);
-        pt->SetBorderSize(1);
-        pt->SetFillColor(kWhite);
-        pt->AddText("Function fitting the ratio: " + linearfit->GetExpFormula());
-        pt->AddText((TString::Format("%s: %.3f#pm%.3f", linearfit->GetParName(0), linearfit->GetParameter(0), linearfit->GetParError(0))));
-        pt->AddText((TString::Format("#Chi^{2}: %.3f", linearfit->GetChisquare())));
-        pt->AddText((TString::Format("NDOF: %d", linearfit->GetNDF())));
-        pt->Draw();
-        closure_norm_pad->Modified();
-
-        //closure_pass_failnn_ratio->SetAxisRange(0, 2, "Y");
-        closure_norm_ratio_pad->cd();
-        closure_pass_failnn_ratio->GetXaxis()->SetTitle(nn_varit->Xlabel());
-        closure_pass_failnn_ratio->GetXaxis()->SetTitleSize(0.1);
-        closure_pass_failnn_ratio->GetXaxis()->SetTitleOffset(0.7);
-        closure_pass_failnn_ratio->GetXaxis()->SetLabelSize(0.09);
-        closure_pass_failnn_ratio->GetYaxis()->SetTitle("Pass/Fail(NN)");
-        closure_pass_failnn_ratio->GetYaxis()->SetTitleSize(0.1);
-        closure_pass_failnn_ratio->GetYaxis()->SetTitleOffset(0.4);
-        closure_pass_failnn_ratio->GetYaxis()->SetNdivisions(5);
-        closure_pass_failnn_ratio->GetYaxis()->SetLabelSize(0.09);
-        closure_norm_ratio_pad->Modified();
-
-        TLine *ideal_ratio_line = new TLine(nn_varit->min_bin,1.0,nn_varit->max_bin,1.0);
-        ideal_ratio_line->SetLineStyle(kDashed);
-        ideal_ratio_line->SetLineColor(kGray);
-        ideal_ratio_line->Draw();
-
-        closure_norm_ratio_canvas->Print(closure_canvas_norm_ratio_filename);
-        closure_norm_ratio_canvas->Clear();
-      }
-    }
+    //FakeNNClosureTest(fake_factory_names, features, Input_feature_var, MVA_feature_var, vartobefit, tmvamethods);
+    FakeNNReader(filenames, fake_factory_names, cuts_final, features, Input_feature_var, MVA_feature_var, tmvamethods);
   }
+  
+  vector<MarkedNames> fnames;
+  {
+    MarkedNames filedati;
+    filedati.name = "InputFiles/data_ptmax_merged.root";
+    filedati.datatype = "Data";
+    filedati.treetype = "BTo2MuP";
+    fnames.push_back(filedati);
+  }
+  {
+    MarkedNames filebcjpsipimc;
+    filebcjpsipimc.name = "InputFiles/BcToJPsiMuMu_is_jpsi_pi_merged_v5.root";
+    filebcjpsipimc.datatype = "MC";
+    filebcjpsipimc.treetype = "BTo2MuP";
+    fnames.push_back(filebcjpsipimc);
+  }
+  // Input trees to be processed (1 for real, 0 for MC)
+  vector<MarkedNames> tnames;
+  tnames.push_back(MarkedNames("BTo2MuP", 0));
 
+        TString mass_type = "bvtx_fit_mass";
+        TString jpsipi_cut = "bvtx_fit_mass>6 &&";
+        jpsipi_cut += "bvtx_fit_mass<6.6 &&";
+        jpsipi_cut += "mu1pt>4.5 &&"
+                    "mu2pt>4.5 &&"
+                    //     "mu1pt>5 &&"
+                    //     "mu2pt>5 &&"
+                    "abs(mu1eta)<2.4 &&"
+                    "abs(mu2eta)<2.4 &&"
+                    //     "mu1pt>3.5 &&"
+                    //     "mu2pt>3.5 &&"
+                    //     "Bpt>15 &&"
+                    //     "Blxy>0.01 &&"            , // 100 micron;
+                    //     "Blxy_sig>3 &&"
+                    //     "Bsvprob>0.005 &&"
+                    //     "Bsvprob>0.001 &&"
+                    //     "Bsvprob>0.1 &&"
+                    "kpt>2.5 &&"
+                    //     "kpt>3.5 &&"
+                    "abs(keta)<2.4 &&"
+                    "bvtx_cos2D>0.999 &&"
+                    "mu1_mediumID>0.5 &&"
+                    "mu2_mediumID>0.5 &&"
+                    "abs(mu1_dz-mu2_dz)<0.2 &&" // *;
+                    "abs(mu1_dz-k_dz)<0.2 &&"   // *;
+                    "abs(mu2_dz-k_dz)<0.2 &&"   // *;
+                    "abs(k_dxy)<0.05 &&"        // *;
+                    "abs(mu1_dxy)<0.05 &&"      // *;
+                    "abs(mu2_dxy)<0.05 &&"      // *;
+                    "(((abs(mu1eta)<1. && abs(mu1eta)<1.) && abs(jpsivtx_fit_mass-3.0969)<0.1) ||"
+                    "(!(abs(mu1eta)<1. && abs(mu1eta)<1.) && abs(jpsivtx_fit_mass-3.0969)<0.15))"; // *;
+
+        // add gen matching;
+        TString jpsipi_cut_mc = jpsipi_cut;
+        jpsipi_cut_mc += "&& abs(k_genpdgId)==211 &&"
+                        "abs(k_mother_pdgId)==541 &&"
+                        "abs(mu1_genpdgId)==13 &&"
+                        "abs(mu1_mother_pdgId)==443 &&"
+                        "abs(mu2_genpdgId)==13 &&"
+                        "abs(mu2_mother_pdgId)==443 &&"
+                        "abs(mu1_grandmother_pdgId)==541 &&"
+                        "abs(mu2_grandmother_pdgId)==541";
+
+  TString cuts_varcomparer = "mu1pt>3 && "
+                                                "mu2pt>3 && "
+                                                "kpt>2.5 && "
+                                                "abs(mu1eta)<2.5 && "
+                                                "abs(mu2eta)<2.5 && "
+                                                "abs(keta)<2.5 && "
+                                                "bvtx_svprob>1e-4 && "
+                                                "jpsivtx_svprob>1e-2 && "
+                                                "mu1_mediumID>0.5 && "
+                                                "mu2_mediumID>0.5 && "
+                                                "Bpt_reco>15 && "
+                                                "dr12>0.01 && "
+                                                "dr13>0.01 && "
+                                                "dr23>0.01 && "
+                                                "abs(mu1_dz-mu2_dz)<0.2 && "
+                                                "abs(mu1_dz-k_dz)<0.2 && "
+                                                "abs(mu2_dz-k_dz)<0.2 && "
+                                                "abs(k_dxy)<0.05 && "
+                                                "abs(mu1_dxy)<0.05 && "
+                                                "abs(mu2_dxy)<0.05 && "
+                                                "bvtx_cos2D>0.995 && "
+                                                "abs(jpsi_mass-3.0969)<0.1 && "
+                                                "Bmass<10. && "
+                                                "jpsivtx_cos2D>0.99 ";
+
+  // Vars to be compared
+  vector<VarToBePlotted>* vnames = new vector<VarToBePlotted> ;
+  // Squared transferred momentum: B_c_pisa
+  VarToBePlotted bvtx_lxy_sig_compared;
+  bvtx_lxy_sig_compared.varname = "bvtx_lxy_sig";
+  bvtx_lxy_sig_compared.varexpression = "bvtx_lxy_sig";
+  bvtx_lxy_sig_compared.tobeprinted = false;
+  bvtx_lxy_sig_compared.comparisonflag = true;
+  bvtx_lxy_sig_compared.comparisonname = "q2_comparison";
+  bvtx_lxy_sig_compared.comparisonlabel = "Q^{2}[GeV^{2}]";
+  bvtx_lxy_sig_compared.xminlim = 0;
+  bvtx_lxy_sig_compared.xmaxlim = 15;
+  bvtx_lxy_sig_compared.vardimension = "";
+  bvtx_lxy_sig_compared.comparisonrationame = "ratio_q2pisa_over_q2gene";
+  bvtx_lxy_sig_compared.comparisonratioexpr = "bvtx_lxy_sig_compared / Q2_Gene";
+  bvtx_lxy_sig_compared.comparisonratiotitle = "Q^{2}_{Pisa} over Q^{2}_{gene}";
+  bvtx_lxy_sig_compared.comparisonratioxlabel = "#frac{Q^{2}_{Pisa}}{Q^{2}_{gene}}";
+  bvtx_lxy_sig_compared.comparisonscattername = "scatter_q2pisa_vs_q2gene";
+  bvtx_lxy_sig_compared.comparisonscattervars = {"Q2_Gene", "bvtx_lxy_sig_compared"};
+  bvtx_lxy_sig_compared.comparisonscattertitle = "Q^{2}_{Pisa} versus Q^{2}_{gene}";
+  bvtx_lxy_sig_compared.comparisonscatterxlabel = "Q^{2}_{gene}[GeV^{2}]";
+  bvtx_lxy_sig_compared.comparisonscatterylabel = "Q^{2}_{Pisa}[GeV^{2}]";
+  bvtx_lxy_sig_compared.wheretoplot = "OutputFiles/PNGPlots/Discriminants/";
+  bvtx_lxy_sig_compared.cut = jpsipi_cut;
+  bvtx_lxy_sig_compared.cut = jpsipi_cut_mc;
+  vnames->push_back(bvtx_lxy_sig_compared);
+
+  VarToBePlotted bvtx_cos2D_compared;
+  bvtx_cos2D_compared.varname = "bvtx_cos2D";
+  bvtx_cos2D_compared.varexpression = "bvtx_cos2D";
+  bvtx_cos2D_compared.tobeprinted = false;
+  bvtx_cos2D_compared.comparisonflag = true;
+  bvtx_cos2D_compared.comparisonname = "q2_comparison";
+  bvtx_cos2D_compared.comparisonlabel = "Q^{2}[GeV^{2}]";
+  bvtx_cos2D_compared.xminlim = 0.9988;
+  bvtx_cos2D_compared.xmaxlim = 1;
+  bvtx_cos2D_compared.vardimension = "";
+  bvtx_cos2D_compared.comparisonrationame = "ratio_q2pisa_over_q2gene";
+  bvtx_cos2D_compared.comparisonratioexpr = "bvtx_cos2D_compared / Q2_Gene";
+  bvtx_cos2D_compared.comparisonratiotitle = "Q^{2}_{Pisa} over Q^{2}_{gene}";
+  bvtx_cos2D_compared.comparisonratioxlabel = "#frac{Q^{2}_{Pisa}}{Q^{2}_{gene}}";
+  bvtx_cos2D_compared.comparisonscattername = "scatter_q2pisa_vs_q2gene";
+  bvtx_cos2D_compared.comparisonscattervars = {"Q2_Gene", "bvtx_cos2D_compared"};
+  bvtx_cos2D_compared.comparisonscattertitle = "Q^{2}_{Pisa} versus Q^{2}_{gene}";
+  bvtx_cos2D_compared.comparisonscatterxlabel = "Q^{2}_{gene}[GeV^{2}]";
+  bvtx_cos2D_compared.comparisonscatterylabel = "Q^{2}_{Pisa}[GeV^{2}]";
+  bvtx_cos2D_compared.wheretoplot = "OutputFiles/PNGPlots/Discriminants/";
+  bvtx_cos2D_compared.cut = jpsipi_cut.Data();
+  bvtx_cos2D_compared.cut = jpsipi_cut_mc.Data();
+  vnames->push_back(bvtx_cos2D_compared);
+
+  VarToBePlotted mu2_zsig_compared;
+  mu2_zsig_compared.varname = "mu2_zsig";
+  mu2_zsig_compared.varexpression = "mu2_dz/mu2_dzErr";
+  mu2_zsig_compared.tobeprinted = false;
+  mu2_zsig_compared.comparisonflag = true;
+  mu2_zsig_compared.comparisonname = "q2_comparison";
+  mu2_zsig_compared.comparisonlabel = "Q^{2}[GeV^{2}]";
+  mu2_zsig_compared.xminlim = 0;
+  mu2_zsig_compared.xmaxlim = 15;
+  mu2_zsig_compared.vardimension = "";
+  mu2_zsig_compared.comparisonrationame = "ratio_q2pisa_over_q2gene";
+  mu2_zsig_compared.comparisonratioexpr = "mu2_zsig_compared / Q2_Gene";
+  mu2_zsig_compared.comparisonratiotitle = "Q^{2}_{Pisa} over Q^{2}_{gene}";
+  mu2_zsig_compared.comparisonratioxlabel = "#frac{Q^{2}_{Pisa}}{Q^{2}_{gene}}";
+  mu2_zsig_compared.comparisonscattername = "scatter_q2pisa_vs_q2gene";
+  mu2_zsig_compared.comparisonscattervars = {"Q2_Gene", "mu2_zsig_compared"};
+  mu2_zsig_compared.comparisonscattertitle = "Q^{2}_{Pisa} versus Q^{2}_{gene}";
+  mu2_zsig_compared.comparisonscatterxlabel = "Q^{2}_{gene}[GeV^{2}]";
+  mu2_zsig_compared.comparisonscatterylabel = "Q^{2}_{Pisa}[GeV^{2}]";
+  mu2_zsig_compared.wheretoplot = "OutputFiles/PNGPlots/Discriminants/";
+  mu2_zsig_compared.cut = jpsipi_cut.Data();
+  mu2_zsig_compared.cut = jpsipi_cut_mc.Data();
+  vnames->push_back(mu2_zsig_compared);
+
+  JPsiReweighting(fnames, treenames, vnames);
   return 0;
 }

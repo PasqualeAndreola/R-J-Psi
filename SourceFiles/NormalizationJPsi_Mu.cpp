@@ -4,7 +4,7 @@
 using namespace std;
 using namespace RooFit;
 
-int NormalizationJPsiMu(const char *cuts,
+int NormalizationJPsiMu(TString cuts,
               bool debug)
 {
   if (debug == false)
@@ -13,12 +13,12 @@ int NormalizationJPsiMu(const char *cuts,
     //      Getting the mass of the 3 muon system in Data and in MC
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ROOT::RDataFrame Data("BTo3Mu", "InputFiles/data_ptmax_merged.root");
-    TH1F *histogram_3mumass_data = (TH1F *)Data.Filter(cuts)
+    TH1F *histogram_3mumass_data = (TH1F *)Data.Filter(cuts.Data())
                                        .Fill<Float_t>(TH1F("mass3mu_Data", "Data", 80, 0, 10), {"Bmass"})
                                        ->Clone();
     histogram_3mumass_data->Sumw2();
     ROOT::RDataFrame HbToJPsiMuMu3MuFilter("BTo3Mu", "InputFiles/HbToJPsiMuMu3MuFilter_ptmax_merged.root");
-    TH1F *histogram_3mumass_mc = (TH1F *)HbToJPsiMuMu3MuFilter.Filter(cuts)
+    TH1F *histogram_3mumass_mc = (TH1F *)HbToJPsiMuMu3MuFilter.Filter(cuts.Data())
                                      .Filter("abs(mu1_grandmother_pdgId)!=541 & abs(mu2_grandmother_pdgId)!=541")
                                      .Fill<Float_t>(TH1F("mass3mu_HbToJPsiMuMu3MuFilter", "jpsimuon_MC", 80, 0, 10), {"Bmass"})
                                      ->Clone();
@@ -43,7 +43,10 @@ int NormalizationJPsiMu(const char *cuts,
     Double_t mumass_sideband_integral_data = histogram_3mumass_data->Integral(histogram_3mumass_data->FindFixBin(mumass_low), histogram_3mumass_data->FindFixBin(mumass_high));
     Double_t mumass_sideband_integral_mc = jpsimu_histstack_sum->Integral(jpsimu_histstack_sum->FindFixBin(mumass_low), jpsimu_histstack_sum->FindFixBin(mumass_high));
     Double_t jpsimu_normalization = mumass_sideband_integral_data / mumass_sideband_integral_mc;
-    cout << jpsimu_normalization << endl;
+    Double_t mumass_sideband_integral_data_relerr = sqrt(mumass_sideband_integral_data)/mumass_sideband_integral_data;
+    Double_t mumass_sideband_integral_mc_relerr = sqrt(mumass_sideband_integral_mc)/mumass_sideband_integral_mc;
+    cout << endl << endl << endl << "JPsi Mu sample normalization: " << jpsimu_normalization << " +- ";
+    cout << jpsimu_normalization*(mumass_sideband_integral_mc_relerr+mumass_sideband_integral_data_relerr) << endl << endl << endl;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Plotting
@@ -51,15 +54,11 @@ int NormalizationJPsiMu(const char *cuts,
     TCanvas *jpsimu_norm_canvas = new TCanvas("jpsimu_norm_canvas", "jpsimu_norm_canvas", 1360, 768);
     jpsimu_norm_canvas->cd(0);
 
-    histogram_3mumass_mc->SetTitle("J/#Psi+#mu sample normalization respect to data");
-    histogram_3mumass_mc->GetXaxis()->SetTitle("(3#mu)Mass");
-    histogram_3mumass_mc->GetYaxis()->SetTitle("Norm. occur. [a. u.]");
-    histogram_3mumass_mc->SetAxisRange(3, 10, "X");
-    histogram_3mumass_mc->SetAxisRange(0, histogram_3mumass_mc->GetMaximum(), "Y");
-    histogram_3mumass_mc->SetStats(false);
-    histogram_3mumass_mc->DrawNormalized("BAR PFC SAME");
-
+    histogram_3mumass_data->SetTitle("J/#Psi+#mu sample normalization respect to data");
+    histogram_3mumass_data->GetXaxis()->SetTitle("(3#mu)Mass [GeV]");
+    histogram_3mumass_data->GetYaxis()->SetTitle("Norm. occur. [a. u.]");
     histogram_3mumass_data->SetAxisRange(0, histogram_3mumass_data->GetMaximum(), "Y");
+    histogram_3mumass_data->SetAxisRange(3, 10, "X");
     histogram_3mumass_data->SetStats(false);
     histogram_3mumass_data->SetMarkerStyle(kFullCircle);
     histogram_3mumass_data->SetMarkerSize(1);
@@ -68,14 +67,23 @@ int NormalizationJPsiMu(const char *cuts,
     histogram_3mumass_data->SetLineColor(kBlack);
     histogram_3mumass_data->DrawNormalized("SAME");
 
+    histogram_3mumass_mc->GetXaxis()->SetTitle("(3#mu)Mass");
+    histogram_3mumass_mc->GetYaxis()->SetTitle("Norm. occur. [a. u.]");
+    histogram_3mumass_mc->SetAxisRange(3, 10, "X");
+    histogram_3mumass_mc->SetAxisRange(0, histogram_3mumass_mc->GetMaximum(), "Y");
+    histogram_3mumass_mc->SetStats(false);
+    histogram_3mumass_mc->DrawNormalized("BAR PFC SAME");
+
+    jpsimu_norm_canvas->Modified();
+    
     //Adjusting the legend
-    TLegend *legend = new TLegend(0.7, 0.81, 0.95, 0.9);
+    TLegend *legend = new TLegend(0.65, 0.81, 0.95, 0.9);
     legend->SetBorderSize(0);
     legend->SetFillColor(0);
     legend->SetFillStyle(0);
     legend->AddEntry(histogram_3mumass_data->GetName(), "Data", "PMC");
     legend->AddEntry(histogram_3mumass_mc->GetName(), "Hb#rightarrowJ/#Psi#mu", "PFC");
-    legend->AddEntry((TObject *)0, TString::Format("Data Over MC: %.2f", jpsimu_normalization), "");
+    legend->AddEntry((TObject *)0, TString::Format("Data Over MC: %.2f#pm%.2f", jpsimu_normalization, jpsimu_normalization*(mumass_sideband_integral_mc_relerr+mumass_sideband_integral_data_relerr)), "");
     legend->Draw("SAME");
     gPad->SetLogy(0);
 

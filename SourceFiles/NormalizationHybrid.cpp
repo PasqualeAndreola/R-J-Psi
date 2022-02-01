@@ -306,6 +306,7 @@ int NormalizationHybrid(bool debug)
     RooFitResult *results_data = fit_function.fitTo(fulldata, RooFit::Save());
 
     fit_function.plotOn(frame);
+    Double_t chi2_datafit = frame->chiSquare();
     fit_function.plotOn(frame, Name("bkg_pol"), RooFit::Components("bkg_pol"), RooFit::LineStyle(kDashed), RooFit::LineColor(kBlue));
     fit_function.plotOn(frame, Name("lxg"), RooFit::Components("lxg"), RooFit::LineStyle(kDashed), RooFit::LineColor(kOrange));
     fit_function.plotOn(frame, Name("signal_fit_function"), RooFit::Components("signal_fit_function"), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed));
@@ -354,7 +355,6 @@ int NormalizationHybrid(bool debug)
 
     leg.Draw("SAME");
     c1.SaveAs("bchybrid_fit_with_mc.png");
-    leg.Clear();
 
     RooArgSet *params = fit_function.getParameters(mass);
     params->writeToStream(cout, false);
@@ -385,6 +385,29 @@ int NormalizationHybrid(bool debug)
     cout << "Fit to data integral " << fulldata.numEntries() * (1 - frac_bkg.getVal()) << endl;
     cout << "Fit to data integral " << frac_sig.getVal() << endl;
     cout << "Fit to mc integral " << (1. + 0.079) * (mc_nsig_narrow.getVal() + mc_nsig_broad.getVal()) << endl;
+
+    c1.cd();
+    c1.Clear();
+    RooPlot *frame_mc = mass.frame();
+    frame_mc->SetTitle("");
+    fullsignal.plotOn(frame_mc, RooFit::Binning(nbins), RooFit::LineColor(kBlack), RooFit::MarkerColor(kBlack));
+    mc_signal_fitFunction.plotOn(frame_mc, Name("mc_signal_fit_function_Norm"), RooFit::LineColor(kRed), RooFit::MarkerColor(kRed));
+    Double_t chi2_mcfit = frame_mc->chiSquare();
+    frame_mc->Draw();
+    TLegend leg2 = TLegend(0.58, .65, .90, .90);
+    leg2.SetBorderSize(0);
+    leg2.SetFillColor(0);
+    leg2.SetFillStyle(0);
+    leg2.SetTextFont(42);
+    leg2.SetTextSize(0.035);
+    leg2.AddEntry(fullsignal.GetName(), "MC data", "P");
+    leg2.AddEntry("mc_signal_fit_function_Norm", "B_{c}#rightarrowJ/#Psi#pi MC fit", "L");
+    leg2.Draw("SAME");
+    c1.SaveAs("bchybrid_fit_only_mc.png");
+    leg2.Clear();
+    
+    cout << "Chi2 of the data fit: " <<  chi2_datafit << endl;
+    cout << "Chi2 of the MC fit: " <<  chi2_mcfit << endl;
   }
 
   return 0;

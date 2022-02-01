@@ -19,7 +19,13 @@ public:
     int geneflag = -1;
     TString dime;
     TString labeltxt;
+    TString datatype = "";
+    TString treetype = "";
     vector<const char *> columns = {""};
+    MarkedNames()
+    {
+        name = "";
+    };
     MarkedNames(TString rnm, int rfl, TString measure = TString(), TString labeltext = TString(), vector<const char *> columnsrequired = {""})
     {
         name = rnm;

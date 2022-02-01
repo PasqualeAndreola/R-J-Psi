@@ -113,8 +113,8 @@ int NormalizationJPsiX(bool debug)
 
     // absolute yields
     RooRealVar nsig = RooRealVar("signal_yield", "signal_yield", 800, 0., 1000000.);
-    RooRealVar nsig_narrow = RooRealVar("signal_yield_narrow", "signal_yield_narrow", 700, 0., 1000000.);
-    RooRealVar nsig_broad = RooRealVar("signal_yield_broad", "signal_yield_broad", 100, 0., 1000000.);
+    RooRealVar nsig_narrow = RooRealVar("signal_yield_narrow", "signal_yield_narrow", 700, 0., 100000000000.);
+    RooRealVar nsig_broad = RooRealVar("signal_yield_broad", "signal_yield_broad", 100, 0., 1000000000000.);
     RooRealVar nbkgtot = RooRealVar("nbkgtot", "nbkgtot", 2000, 0., 1000000.);
     RooRealVar nbkg = RooRealVar("nbkg", "nbkg", 7000, 0., 1000000.);
     RooRealVar nPi = RooRealVar("nPi", "nPi", 1000, 0., 1000000.);
@@ -173,8 +173,8 @@ int NormalizationJPsiX(bool debug)
     RooGaussian mc_broad_gaus = RooGaussian("mc_sig_broad_gaus", "mc_sig_broad_gaus", mass, mc_broad_mean, mc_broad_width);
 
     RooRealVar mc_nsig = RooRealVar("mc_signal_yield", "mc_signal_yield", 800, 0, 100000);
-    RooRealVar mc_nsig_narrow = RooRealVar("mc_signal_yield_narrow", "mc_signal_yield_narrow", 700, 0, 100000);
-    RooRealVar mc_nsig_broad = RooRealVar("mc_signal_yield_broad", "mc_signal_yield_broad", 100, 0, 100000);
+    RooRealVar mc_nsig_narrow = RooRealVar("mc_signal_yield_narrow", "mc_signal_yield_narrow", 700, 0, 100000000000000);
+    RooRealVar mc_nsig_broad = RooRealVar("mc_signal_yield_broad", "mc_signal_yield_broad", 100, 0, 100000000000000);
 
     // MC signal function
     RooAddPdf mc_signal_fitFunction = RooAddPdf(
@@ -313,6 +313,7 @@ int NormalizationJPsiX(bool debug)
     RooFitResult *results_data = fit_function.fitTo(fulldata, RooFit::Save());
 
     fit_function.plotOn(frame);
+    Double_t chi2_datafit = frame->chiSquare();
     fit_function.plotOn(frame, Name("bkg_pol"), RooFit::Components("bkg_pol"), RooFit::LineStyle(kDashed), RooFit::LineColor(kBlue));
     fit_function.plotOn(frame, Name("lxg"), RooFit::Components("lxg"), RooFit::LineStyle(kDashed), RooFit::LineColor(kOrange));
     fit_function.plotOn(frame, Name("signal_fit_function"), RooFit::Components("signal_fit_function"), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed));
@@ -360,11 +361,31 @@ int NormalizationJPsiX(bool debug)
     leg.Draw("SAME");
     c1.SaveAs("jpsi+x_fit_with_mc.png");
 
+    c1.cd();
+    c1.Clear();
+    RooPlot *frame_mc = mass.frame();
+    frame_mc->SetTitle("");
+    fullsignal.plotOn(frame_mc, RooFit::Binning(nbins), RooFit::LineColor(kBlack), RooFit::MarkerColor(kBlack));
+    mc_signal_fitFunction.plotOn(frame_mc, Name("mc_signal_fit_function_Norm"), RooFit::LineColor(kRed), RooFit::MarkerColor(kRed));
+    Double_t chi2_mcfit = frame_mc->chiSquare();
+    frame_mc->Draw();
+    TLegend leg2 = TLegend(0.58, .65, .90, .90);
+    leg2.SetBorderSize(0);
+    leg2.SetFillColor(0);
+    leg2.SetFillStyle(0);
+    leg2.SetTextFont(42);
+    leg2.SetTextSize(0.035);
+    leg2.AddEntry(fullsignal.GetName(), "MC data", "P");
+    leg2.AddEntry("mc_signal_fit_function_Norm", "B^{+}#rightarrowJ/#PsiK^{+} MC fit", "L");
+    leg2.Draw("SAME");
+    c1.SaveAs("jpsix_fit_only_mc.png");
+    leg2.Clear();
+
     RooArgSet *params = fit_function.getParameters(mass);
     params->writeToStream(cout, false);
     RooArgSet *mcparams = mc_signal_fitFunction.getParameters(mass);
     mcparams->writeToStream(cout, false);
-
+/*
     // Create a new empty workspace
     RooWorkspace *jpsixworkspace = new RooWorkspace("jpsixworkspace", "jpsixworkspace");
 
@@ -385,7 +406,7 @@ int NormalizationJPsiX(bool debug)
 
     // Save the workspace into a ROOT file
     jpsixworkspace->writeToFile("jpsix_workspace.root");
-
+*/
     cout << "Fit to data integral " << fulldata.numEntries() * (1 - frac_bkg.getVal()) << endl;
     cout << "Fit to data integral " << frac_sig.getVal() << " " << fulldata.numEntries() * frac_sig.getVal() << endl;
     cout << "Fit to mc integral " << (1. + 0.079) * (mc_nsig_narrow.getVal() + mc_nsig_broad.getVal()) << endl;
@@ -420,6 +441,8 @@ int NormalizationJPsiX(bool debug)
     cout << "Low region2 signal events: " << nevents_lowsignal2 << endl;
     cout << "Up  region2 signal events: " <<  nevents_upsignal2 << endl;
 
+    cout << "Chi2 of the data fit: " <<  chi2_datafit << endl;
+    cout << "Chi2 of the MC fit: " <<  chi2_mcfit << endl;
   }
   return 0;
 }

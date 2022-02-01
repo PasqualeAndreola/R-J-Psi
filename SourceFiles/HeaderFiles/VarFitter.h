@@ -42,16 +42,24 @@
 #include <RooFit.h>
 #include <RooHistPdf.h>
 #include <RooAddPdf.h>
+#include <RooClassFactory.h>
 #include <RooExtendPdf.h>
 #include <RooProduct.h>
 #include <RooProdPdf.h>
 #include <RooDataSet.h>
+#include <RooGaussian.h>
 #include <RooMinimizer.h>
+#include <RooFormulaVar.h>
+#include <RooWrapperPdf.h>
+#include <RooFitResult.h>
+#include <TMinuit.h>
+#include <RooConstVar.h>
 
 /*These namespaces can be useful*/
 using namespace std;
 
-int VarFitter(vector<VarToBeFitted> *tobediscriminated,
-              bool debug = false);
+int VarFitter(VarToBeFitted *tobediscriminated,
+              bool debug = false,
+              string closuretest = "DATA");
 
 #endif

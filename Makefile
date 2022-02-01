@@ -12,12 +12,18 @@ INPUTDIR  := InputFiles
 OUTPUTDIR := OutputFiles
 OUTPUTDIR += OutputFiles/PNGPlots
 OUTPUTDIR += OutputFiles/PNGPlots/Angles
+OUTPUTDIR += OutputFiles/PNGPlots/Angles/Quadrati
 OUTPUTDIR += OutputFiles/PNGPlots/Discriminants
 OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies
 OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/Q_squared
 OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/Missing_mass_squared
 OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/Missing_pt
 OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/ctau
+OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/Q_squared_quadrati
+OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/Missing_mass_squared_quadrati
+OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/Missing_pt_quadrati
+OUTPUTDIR += OutputFiles/PNGPlots/Efficiencies/ctau_quadrati
+OUTPUTDIR += OutputFiles/PNGPlots/FitResults
 OUTPUTDIR += OutputFiles/TMVAResults/ClosureTest
 OUTPUTDIR += OutputFiles/TMVAResults/ClosureTest/Normalized
 OUTPUTDIR += OutputFiles/TMVAResults/ClosureTest/Normalized/Pass_NNFail_Ratio
@@ -32,11 +38,15 @@ CXXFLAGS 	 := -O3 -g -Wall $(shell root-config --cflags)
 
 #Includes
 INCROOT 	 := -I$(shell root-config --incdir)
+INCROOT 	 += -I/home/pasquale/Scaricati/2.4.0
+INCROOT 	 += -I/home/root/include/Math
+INCROOT 	 += -I/home/root/include/RooStats
 INCLUDES     := $(INCROOT)
 
 #Libraries that has to be linked
-LIBSROOT 	 := $(shell root-config --libs)
-LIBSROOT     += -L/home/pasquale/root/lib -lRooFitCore -lRooFit -lTMVA -lTMVAGui -lXMLIO
+LIBSROOT     := -L/home/pasquale/Scaricati/2.4.0 -lBlue
+LIBSROOT 	 += $(shell root-config --libs)
+LIBSROOT     += -L/home/pasquale/root/lib -lRooFitCore -lRooFit -lTMVA -lTMVAGui -lXMLIO -lMathMore -lSPlot -lRooStats 
 LIBS 	 	 := $(LIBSROOT)
 
 #Sources and objects research

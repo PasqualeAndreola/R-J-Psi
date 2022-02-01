@@ -12,13 +12,22 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
     ROOT::RDF::RResultPtr<TH1F> histcompare_norm, histcompare_sig, histcompare_signor, histcompare_bkg;
     TH1F histcompare_ratio;
     TCanvas canvas_comparison = TCanvas("canvas_comparison", "canvas_comparison", 1360, 768);
+    TCanvas canvas_comparison_quadrati = TCanvas("canvas_comparison_quadrati", "canvas_comparison_quadrati", 1080, 1080);
     TCanvas canvas_comparison_ratio = TCanvas("canvas_comparison_ratio", "canvas_comparison_ratio", 1360, 768);
 
     TCanvas canvas_comparison_roc_sigvsnorm = TCanvas("canvas_comparison_roc_sigvsnorm", "canvas_comparison_roc_sigvsnorm", 1360, 768);
     TCanvas canvas_comparison_roc_sigvsbkg = TCanvas("canvas_comparison_roc_sigvsbkg", "canvas_comparison_roc_sigvsbkg", 1360, 768);
     TCanvas canvas_comparison_roc_normvsbkg = TCanvas("canvas_comparison_roc_normvsbkg", "canvas_comparison_roc_normvsbkg", 1360, 768);
     TCanvas canvas_comparison_roc_signormvsbkg = TCanvas("canvas_comparison_roc_signormvsbkg", "canvas_comparison_roc_signormvsbkg", 1360, 768);
+    TCanvas canvas_compraison_quadratiroc_sigvsnorm = TCanvas("canvas_compraison_quadratiroc_sigvsnorm", "canvas_compraison_quadratiroc_sigvsnorm", 1080, 1080);
+    TCanvas canvas_compraison_quadratiroc_sigvsbkg = TCanvas("canvas_compraison_quadratiroc_sigvsbkg", "canvas_compraison_quadratiroc_sigvsbkg", 1080, 1080);
+    TCanvas canvas_compraison_quadratiroc_normvsbkg = TCanvas("canvas_compraison_quadratiroc_normvsbkg", "canvas_compraison_quadratiroc_normvsbkg", 1080, 1080);
+    TCanvas canvas_compraison_quadratiroc_signormvsbkg = TCanvas("canvas_compraison_quadratiroc_signormvsbkg", "canvas_compraison_quadratiroc_signormvsbkg", 1080, 1080);
     TLegend legend_roc_sigvsnorm, legend_roc_sigvsbkg, legend_roc_normvsbkg, legend_roc_signormvsbkg;
+    vector<TGraph> legend_roc_sigvsnorm_graph; vector<TString> legend_roc_sigvsnorm_entries;
+    vector<TGraph> legend_roc_sigvsbkg_graph; vector<TString> legend_roc_sigvsbkg_entries;
+    vector<TGraph> legend_roc_normvsbkg_graph; vector<TString> legend_roc_normvsbkg_entries;
+    vector<TGraph> legend_roc_signormvsbkg_graph; vector<TString> legend_roc_signormvsbkg_entries;
     TMultiGraph roc_sig_norm, roc_sig_bkg, roc_norm_bkg, roc_signorm_bkg;
 
     TCanvas canvas_comparison_roc_inverted_sigvsnorm = TCanvas("canvas_comparison_roc_inverted_sigvsnorm", "canvas_comparison_roc_inverted_sigvsnorm", 1360, 768);
@@ -56,19 +65,19 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
     {
         Float_t bins = discriminant->discriminantbins, min = discriminant->discriminantmin, max = discriminant->discriminantmax;
         if (Signal->HasColumn(discriminant->discriminantname) == false) continue;
-        histcompare_sig = Signal->Fill(TH1F(TString::Format("%s_sig", discriminant->discriminantname), TString::Format("%s_sig", discriminant->discriminantname),
+        histcompare_sig = Signal->Fill(TH1F(TString::Format("%s_sig", discriminant->discriminantprettyname), TString::Format("%s_sig", discriminant->discriminantname),
                                             bins, min, max),
                                        {discriminant->discriminantname});
         if (Normalization->HasColumn(discriminant->discriminantname) == false) continue;
-        histcompare_norm = Normalization->Fill(TH1F(TString::Format("%s_norm", discriminant->discriminantname), TString::Format("%s_norm", discriminant->discriminantname),
+        histcompare_norm = Normalization->Fill(TH1F(TString::Format("%s_norm", discriminant->discriminantprettyname), TString::Format("%s_norm", discriminant->discriminantname),
                                                     bins, min, max),
                                                {discriminant->discriminantname});
         if (Signorm->HasColumn(discriminant->discriminantname) == false) continue;
-        histcompare_signor = Signorm->Fill(TH1F(TString::Format("%s_signorm", discriminant->discriminantname), TString::Format("%s_signorm", discriminant->discriminantname),
+        histcompare_signor = Signorm->Fill(TH1F(TString::Format("%s_signorm", discriminant->discriminantprettyname), TString::Format("%s_signorm", discriminant->discriminantname),
                                                     bins, min, max),
                                             {discriminant->discriminantname});
         if (Background->HasColumn(discriminant->discriminantname) == false) continue;            
-        histcompare_bkg = Background->Fill(TH1F(TString::Format("%s_bkg", discriminant->discriminantname), TString::Format("%s_bkg", discriminant->discriminantname),
+        histcompare_bkg = Background->Fill(TH1F(TString::Format("%s_bkg", discriminant->discriminantprettyname), TString::Format("%s_bkg", discriminant->discriminantname),
                                                 bins, min, max),
                                            {discriminant->discriminantname});
 
@@ -146,10 +155,10 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
             histcompare_stack.GetYaxis()->SetTitle(discriminant->signormplot_ytitle);
 
             //Adjusting the legend
-            TLegend *legend = new TLegend(0.1, 0.81, 0.28, 0.9);
+            TLegend *legend = new TLegend(0.1, 0.81, 0.31, 0.9);
             if (discriminant->distributionplotlegend != NULL) legend = (discriminant->distributionplotlegend);
-            legend->AddEntry(histcompare_signor->GetName(), TString::Format("%s_Sig+Norm", discriminant->discriminantname), "PLC PMC");
-            legend->AddEntry(histcompare_bkg->GetName(), TString::Format("%s_Bkg", discriminant->discriminantname), "PLC PMC");
+            legend->AddEntry(histcompare_signor->GetName(), TString::Format("%s_Sig+Norm", discriminant->discriminantprettyname), "PLC PMC");
+            legend->AddEntry(histcompare_bkg->GetName(), TString::Format("%s_Bkg", discriminant->discriminantprettyname), "PLC PMC");
             legend->SetTextSize(0.025);
             legend->Draw("SAME");
             if (discriminant->distributionlogscale != 0) {histcompare_signor->SetMinimum(1e-4); histcompare_bkg->SetMinimum(1e-4);
@@ -231,11 +240,11 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
             histcompare_stack.GetYaxis()->SetTitle(discriminant->signormplot_ytitle);
 
             //Adjusting the legend
-            TLegend *legend = new TLegend(0.1, 0.81, 0.28, 0.9);
+            TLegend *legend = new TLegend(0.1, 0.81, 0.31, 0.9);
             if (discriminant->distributionplotlegend != NULL) legend = (discriminant->distributionplotlegend);
-            legend->AddEntry(histcompare_norm->GetName(), TString::Format("%s_Norm", discriminant->discriminantname), "PLC PMC");
-            legend->AddEntry(histcompare_sig->GetName(), TString::Format("%s_Sig", discriminant->discriminantname), "PLC PMC");
-            legend->AddEntry(histcompare_bkg->GetName(), TString::Format("%s_Bkg", discriminant->discriminantname), "PLC PMC");
+            legend->AddEntry(histcompare_norm->GetName(), TString::Format("%s_Norm", discriminant->discriminantprettyname), "PLC PMC");
+            legend->AddEntry(histcompare_sig->GetName(), TString::Format("%s_Sig", discriminant->discriminantprettyname), "PLC PMC");
+            legend->AddEntry(histcompare_bkg->GetName(), TString::Format("%s_Bkg", discriminant->discriminantprettyname), "PLC PMC");
             legend->SetTextSize(0.025);
             legend->Draw("SAME");
             if (discriminant->distributionlogscale != 0) {histcompare_sig->SetMinimum(1e-4); histcompare_norm->SetMinimum(1e-4); histcompare_bkg->SetMinimum(1e-4);
@@ -244,6 +253,26 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
             canvas_comparison.Print(TString::Format("%s/%s_distribution_sig_norm_bkg.png", discriminant->output_directory_png, discriminant->discriminantname));
             canvas_comparison.Clear();
             legend->Clear();
+            gPad->SetLogy(0);
+
+            canvas_comparison_quadrati.cd();
+            canvas_comparison_quadrati.Clear();
+            gPad->SetRightMargin(0.05);
+            gPad->SetLeftMargin(0.15);
+            histcompare_stack.Draw("NOSTACK PLC PMC");
+            TLegend legend_quadrati = discriminant->SetLegendPosAuto(discriminant->legpos, 3, discriminant->legxlength);
+            if (discriminant->distributionplotlegend != NULL) legend = (discriminant->distributionplotlegend);
+            legend_quadrati.AddEntry(histcompare_norm->GetName(), TString::Format("%s_Norm", discriminant->discriminantprettyname), "PLC PMC");
+            legend_quadrati.AddEntry(histcompare_sig->GetName(), TString::Format("%s_Sig", discriminant->discriminantprettyname), "PLC PMC");
+            legend_quadrati.AddEntry(histcompare_bkg->GetName(), TString::Format("%s_Bkg", discriminant->discriminantprettyname), "PLC PMC");
+            legend_quadrati.SetTextSize(0.025);
+            legend_quadrati.Draw("SAME");
+            if (discriminant->distributionlogscale != 0) {histcompare_sig->SetMinimum(1e-4); histcompare_norm->SetMinimum(1e-4); histcompare_bkg->SetMinimum(1e-4);
+                                                          histcompare_sig->SetMaximum(1e-1); histcompare_norm->SetMaximum(1e-1); histcompare_bkg->SetMaximum(1e-1); gPad->SetLogy();}
+            canvas_comparison_quadrati.Update();
+            canvas_comparison_quadrati.Print(TString::Format("%s/%s_distribution_sig_norm_bkg.png", TString::Format("%s_quadrati",discriminant->output_directory_png).Data(), discriminant->discriminantname));
+            canvas_comparison_quadrati.Clear();
+            legend_quadrati.Clear();
             gPad->SetLogy(0);
         }
 
@@ -310,7 +339,7 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
             ratiostats->SetName("Pisa Q^{2} distribution Ratio: Signal over Normalization");
             ratiostats->SetOptStat(112211);
             ratiostats->SetX1NDC(0.1);
-            ratiostats->SetX2NDC(0.28);
+            ratiostats->SetX2NDC(0.31);
             ratiostats->SetY1NDC(0.78);
             ratiostats->SetY2NDC(0.9);
             ratiostats->Draw("same");
@@ -344,7 +373,7 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
             ratiostats->SetName("Pisa Q^{2} distribution Ratio: Signal over Background");
             ratiostats->SetOptStat(112211);
             ratiostats->SetX1NDC(0.1);
-            ratiostats->SetX2NDC(0.28);
+            ratiostats->SetX2NDC(0.31);
             ratiostats->SetY1NDC(0.78);
             ratiostats->SetY2NDC(0.9);
             ratiostats->Draw("same");
@@ -378,7 +407,7 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
             ratiostats->SetName("Pisa Q^{2} distribution Ratio: Normalization over Background");
             ratiostats->SetOptStat(112211);
             ratiostats->SetX1NDC(0.1);
-            ratiostats->SetX2NDC(0.28);
+            ratiostats->SetX2NDC(0.31);
             ratiostats->SetY1NDC(0.78);
             ratiostats->SetY2NDC(0.9);
             ratiostats->Draw("same");
@@ -412,7 +441,7 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
             ratiostats->SetName("Pisa Q^{2} distribution Ratio: Sig+Norm over Background");
             ratiostats->SetOptStat(112211);
             ratiostats->SetX1NDC(0.1);
-            ratiostats->SetX2NDC(0.28);
+            ratiostats->SetX2NDC(0.31);
             ratiostats->SetY1NDC(0.78);
             ratiostats->SetY2NDC(0.9);
             ratiostats->Draw("same");
@@ -445,7 +474,8 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
             legend_roc_sigvsnorm.SetY1NDC(0.78);
             legend_roc_sigvsnorm.SetY2NDC(0.9);
             gPad->Modified();
-            
+            legend_roc_sigvsnorm_graph.push_back(roc_curve_sig_norm);
+            legend_roc_sigvsnorm_entries.push_back(discriminant->discriminantprettyname);
             if (discriminant != tobediscriminated->end() && (discriminant+1)->discriminantvariable != discriminant->discriminantvariable)
             {
                 roc_sig_norm.GetHistogram()->SetTitle(TString::Format("ROC (Sig vs Norm): %s comparison", roc_curve_title.Data()));
@@ -457,9 +487,29 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
                 roc_sig_norm.Draw("AP PLC PMC");
                 legend_roc_sigvsnorm.Draw("same");
                 canvas_comparison_roc_sigvsnorm.Print(TString::Format("%s/%s_roc_sig_vs_norm.png", discriminant->output_directory_png, discriminant->discriminantvariable));
+
+                canvas_compraison_quadratiroc_sigvsnorm.cd();
+                canvas_compraison_quadratiroc_sigvsnorm.Clear();
+                gPad->SetRightMargin(0.05);
+                gPad->SetLeftMargin(0.15);
+                roc_sig_norm.Draw("AP PLC PMC");
+                TLegend legend_quadrati = discriminant->SetLegendPosAuto("TR", 3, discriminant->legxlength);
+                legend_quadrati.SetHeader(TString::Format("ROC curve for %s", discriminant->discriminantvariable), "C");
+                int i = 0;
+                for(auto graph=legend_roc_sigvsnorm_graph.begin(); graph<legend_roc_sigvsnorm_graph.end(); graph++)
+                {
+                    legend_quadrati.AddEntry(graph->GetName(), legend_roc_sigvsnorm_entries[i].Data(), "P");
+                    i++;
+                }
+                legend_quadrati.SetTextSize(0.025);
+                legend_quadrati.Draw("SAME");
+                canvas_compraison_quadratiroc_sigvsnorm.Print(TString::Format("%s/%s_roc_sig_vs_norm.png", TString::Format("%s_quadrati",discriminant->output_directory_png).Data(), discriminant->discriminantvariable));
+
                 roc_sig_norm.GetListOfGraphs()->Delete();
                 legend_roc_sigvsnorm.Clear();    
                 canvas_comparison_roc_sigvsnorm.Clear();
+                legend_roc_sigvsnorm_graph.clear();
+                legend_roc_sigvsnorm_entries.clear();
             }
 
             // ROC curves: Signal with respect to Background
@@ -482,7 +532,8 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
             legend_roc_sigvsbkg.SetY1NDC(0.78);
             legend_roc_sigvsbkg.SetY2NDC(0.9);
             gPad->Modified();
-            
+            legend_roc_sigvsbkg_graph.push_back(roc_curve_sig_norm);
+            legend_roc_sigvsbkg_entries.push_back(discriminant->discriminantname);
             if (discriminant != tobediscriminated->end() && (discriminant+1)->discriminantvariable != discriminant->discriminantvariable)
             {
                 roc_sig_bkg.GetHistogram()->SetTitle(TString::Format("ROC (Sig vs Bkg): %s comparison", roc_curve_title.Data()));
@@ -494,6 +545,27 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
                 roc_sig_bkg.Draw("AP PLC PMC");
                 legend_roc_sigvsbkg.Draw("same");               
                 canvas_comparison_roc_sigvsbkg.Print(TString::Format("%s/%s_roc_sig_vs_bkg.png", discriminant->output_directory_png, discriminant->discriminantvariable));
+
+                canvas_compraison_quadratiroc_sigvsbkg.cd();
+                canvas_compraison_quadratiroc_sigvsbkg.Clear();
+                gPad->SetRightMargin(0.05);
+                gPad->SetLeftMargin(0.15);
+                roc_sig_bkg.Draw("AP PLC PMC");
+                TLegend legend_quadrati = discriminant->SetLegendPosAuto("TR", 3, (discriminant->legxlength)-0.05);
+                legend_quadrati.SetHeader(TString::Format("ROC curve for %s", discriminant->discriminantvariable), "C");
+                int i = 0;
+                for(auto graph=legend_roc_sigvsbkg_graph.begin(); graph<legend_roc_sigvsbkg_graph.end(); graph++)
+                {
+                    legend_quadrati.AddEntry(graph->GetName(), legend_roc_sigvsbkg_entries[i].Data(), "P");
+                    i++;
+                }
+                legend_quadrati.SetTextSize(0.025);
+                legend_quadrati.Draw("SAME");
+                canvas_compraison_quadratiroc_sigvsbkg.Print(TString::Format("%s/%s_roc_sig_vs_bkg.png", TString::Format("%s_quadrati",discriminant->output_directory_png).Data(), discriminant->discriminantvariable));
+                legend_roc_sigvsbkg.Clear();    
+                legend_roc_sigvsbkg_graph.clear();
+                legend_roc_sigvsbkg_entries.clear();
+                
                 roc_sig_bkg.GetListOfGraphs()->Delete();
                 legend_roc_sigvsbkg.Clear();
                 canvas_comparison_roc_sigvsbkg.Clear();
@@ -519,7 +591,8 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
             legend_roc_normvsbkg.SetY1NDC(0.78);
             legend_roc_normvsbkg.SetY2NDC(0.9);
             gPad->Modified();
-            
+            legend_roc_normvsbkg_graph.push_back(roc_curve_norm_bkg);
+            legend_roc_normvsbkg_entries.push_back(discriminant->discriminantname);            
             if (discriminant != tobediscriminated->end() && (discriminant+1)->discriminantvariable != discriminant->discriminantvariable)
             {
                 roc_norm_bkg.GetHistogram()->SetTitle(TString::Format("ROC (Norm vs Bkg): %s comparison", roc_curve_title.Data()));
@@ -531,6 +604,27 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
                 roc_norm_bkg.Draw("AP PLC PMC");
                 legend_roc_normvsbkg.Draw("same");
                 canvas_comparison_roc_normvsbkg.Print(TString::Format("%s/%s_roc_norm_vs_bkg.png", discriminant->output_directory_png, discriminant->discriminantvariable));
+
+                canvas_compraison_quadratiroc_normvsbkg.cd();
+                canvas_compraison_quadratiroc_normvsbkg.Clear();
+                gPad->SetRightMargin(0.05);
+                gPad->SetLeftMargin(0.15);
+                roc_norm_bkg.Draw("AP PLC PMC");
+                TLegend legend_quadrati = discriminant->SetLegendPosAuto("TR", 3, (discriminant->legxlength)-0.05);
+                legend_quadrati.SetHeader(TString::Format("ROC curve for %s", discriminant->discriminantvariable), "C");
+                int i = 0;
+                for(auto graph=legend_roc_normvsbkg_graph.begin(); graph<legend_roc_normvsbkg_graph.end(); graph++)
+                {
+                    legend_quadrati.AddEntry(graph->GetName(), legend_roc_normvsbkg_entries[i].Data(), "P");
+                    i++;
+                }
+                legend_quadrati.SetTextSize(0.025);
+                legend_quadrati.Draw("SAME");
+                canvas_compraison_quadratiroc_normvsbkg.Print(TString::Format("%s/%s_roc_norm_vs_bkg.png", TString::Format("%s_quadrati",discriminant->output_directory_png).Data(), discriminant->discriminantvariable));
+                legend_roc_normvsbkg.Clear();    
+                legend_roc_normvsbkg_graph.clear();
+                legend_roc_normvsbkg_entries.clear();
+
                 roc_norm_bkg.GetListOfGraphs()->Delete();
                 legend_roc_normvsbkg.Clear();
                 canvas_comparison_roc_normvsbkg.Clear();
@@ -557,7 +651,8 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
             legend_roc_signormvsbkg.SetY1NDC(0.78);
             legend_roc_signormvsbkg.SetY2NDC(0.9);
             gPad->Modified();
-            
+            legend_roc_signormvsbkg_graph.push_back(roc_curve_signorm_bkg);
+            legend_roc_signormvsbkg_entries.push_back(discriminant->discriminantname);                
             if (discriminant != tobediscriminated->end() && (discriminant+1)->discriminantvariable != discriminant->discriminantvariable)
             {                
                 roc_signorm_bkg.GetHistogram()->SetTitle(TString::Format("ROC (Sig+Norm vs Bkg): %s comparison", roc_curve_title.Data()));
@@ -569,6 +664,27 @@ int EfficienciesPlotter(unordered_map<string, pair<string, string>> data_holder,
                 roc_signorm_bkg.Draw("AP PLC PMC");
                 legend_roc_signormvsbkg.Draw("same");
                 canvas_comparison_roc_signormvsbkg.Print(TString::Format("%s/%s_roc_signorm_vs_bkg.png", discriminant->output_directory_png, discriminant->discriminantvariable));
+
+                canvas_compraison_quadratiroc_signormvsbkg.cd();
+                canvas_compraison_quadratiroc_signormvsbkg.Clear();
+                gPad->SetRightMargin(0.05);
+                gPad->SetLeftMargin(0.15);
+                roc_signorm_bkg.Draw("AP PLC PMC");
+                TLegend legend_quadrati = discriminant->SetLegendPosAuto("TR", 3, (discriminant->legxlength)-0.05);
+                legend_quadrati.SetHeader(TString::Format("ROC curve for %s", discriminant->discriminantvariable), "C");
+                int i = 0;
+                for(auto graph=legend_roc_signormvsbkg_graph.begin(); graph<legend_roc_signormvsbkg_graph.end(); graph++)
+                {
+                    legend_quadrati.AddEntry(graph->GetName(), legend_roc_signormvsbkg_entries[i].Data(), "P");
+                    i++;
+                }
+                legend_quadrati.SetTextSize(0.025);
+                legend_quadrati.Draw("SAME");
+                canvas_compraison_quadratiroc_signormvsbkg.Print(TString::Format("%s/%s_roc_signorm_vs_bkg.png", TString::Format("%s_quadrati",discriminant->output_directory_png).Data(), discriminant->discriminantvariable));
+                legend_roc_signormvsbkg.Clear();    
+                legend_roc_signormvsbkg_graph.clear();
+                legend_roc_signormvsbkg_entries.clear();
+
                 roc_signorm_bkg.GetListOfGraphs()->Delete();
                 legend_roc_signormvsbkg.Clear();
                 canvas_comparison_roc_signormvsbkg.Clear();

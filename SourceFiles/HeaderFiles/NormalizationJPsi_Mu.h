@@ -56,6 +56,6 @@
 /*These namespaces can be useful*/
 using namespace std;
 
-int NormalizationJPsiMu(const char *cuts, bool debug = false);
+int NormalizationJPsiMu(TString cuts, bool debug = false);
 
 #endif

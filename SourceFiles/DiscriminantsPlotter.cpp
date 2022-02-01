@@ -39,6 +39,7 @@ int DiscriminantsPlotter(vector<MarkedNames> file2read,
         TString outhistpdf = TString::Format("OutputFiles/%s_Manipulated_Variables.pdf", fileiterator->labeltxt.Data());
 
         TCanvas *c0 = new TCanvas(TString::Format("ca%s", fileiterator->name.Data()), TString::Format("ca%s", fileiterator->name.Data()), 1366, 768);
+        TCanvas *c0square = new TCanvas(TString::Format("casquare%s", fileiterator->name.Data()), TString::Format("casquare%s", fileiterator->name.Data()), 1080, 1080);
         c0->Print(TString::Format("%s[", outhistpdf.Data()));
 
         for (vector<MarkedNames>::iterator treeiterator = trees2read.begin(); treeiterator != trees2read.end(); ++treeiterator)
@@ -150,6 +151,39 @@ int DiscriminantsPlotter(vector<MarkedNames> file2read,
                     c0->Print(TString::Format("%s", outhistpdf.Data()));
                     c0->Print(TString::Format("%s%s_%s.png", plotvar->wheretoplot.data(), fileiterator->labeltxt.Data(), plotvar->varname.data()));
                     c0->Clear();
+                    if (plotvar->tobesquareprinted == false) histang->Reset("ICESM");
+                }
+
+                if (plotvar->tobesquareprinted == true)
+                {
+                    // Plotting the histogram of these variables
+                    c0square->cd();
+                    histang->SetTitle(plotvar->plottitle.data());
+                    histang->GetXaxis()->SetTitle(plotvar->plotxlabel.data());
+                    histang->GetYaxis()->SetTitle("Occurences");
+                    histang->SetLineColorAlpha(kRed, 1);
+                    histang->SetFillStyle(1001);
+                    histang->SetFillColor(kRed);
+                    histang->SetFillColorAlpha(kRed, 0.5);
+                    histang->SetMarkerStyle(kFullSquare);
+                    histang->SetMarkerColor(kRed);
+                    histang->SetMarkerSize(1.5);
+                    histang->Draw("HF P");
+                    c0square->SetLogy();
+                    c0square->Update();
+
+                    //Adjusting the stats
+                    TPaveStats *recostats = (TPaveStats *)c0square->GetPrimitive("stats");
+                    recostats->SetX1NDC(0.65);
+                    recostats->SetX2NDC(0.93);
+                    recostats->SetY1NDC(0.63);
+                    recostats->SetY2NDC(0.9);
+                    recostats->Draw("same");
+                    recostats->SetOptStat(112111);
+                    c0square->Modified();
+                    c0square->Print(TString::Format("%s", outhistpdf.Data()));
+                    c0square->Print(TString::Format("%s%s_%s.png", (plotvar->wheretoplot+"Quadrati/").data(), fileiterator->labeltxt.Data(), plotvar->varname.data()));
+                    c0square->Clear();
                     histang->Reset("ICESM");
                 }
 
@@ -445,7 +479,7 @@ int DiscriminantsPlotter(vector<MarkedNames> file2read,
                                                                                                 {"abs_mu1_grandmother_eta", "eta_resolution_grandmother_beambreco"});
             hprofile_eta_res_grandmother_beambreco->SetTitle("Different resolutions for various eta regions");
             hprofile_eta_res_grandmother_beambreco->GetXaxis()->SetTitle("|#eta_{Grandmother}|[]");
-            hprofile_eta_res_grandmother_beambreco->GetYaxis()->SetTitle("Resolution");
+            hprofile_eta_res_grandmother_beambreco->GetYaxis()->SetTitle("#eta_{Grandmother}-#eta_{Reconstructed}");
             hprofile_eta_res_grandmother_beambreco->GetYaxis()->SetRangeUser(-0.006, 0.008);
             hprofile_eta_res_grandmother_beambreco->SetErrorOption("");
             hprofile_eta_res_grandmother_beambreco->SetStats(false);
@@ -461,7 +495,7 @@ int DiscriminantsPlotter(vector<MarkedNames> file2read,
                                                                                          8, 0, 2.4, -0.1, 0.1), 
                                                                                          {"abs_mu1_grandmother_eta", "eta_resolution_grandmother_3mumomentareco"});
             hprofile_eta_res_grandmother_3mu->GetXaxis()->SetTitle("|#eta_{Grandmother}|[]");
-            hprofile_eta_res_grandmother_3mu->GetYaxis()->SetTitle("Resolution");
+            hprofile_eta_res_grandmother_3mu->GetYaxis()->SetTitle("#eta_{Grandmother}-#eta_{Reconstructed}");
             hprofile_eta_res_grandmother_3mu->GetYaxis()->SetRangeUser(-0.006, 0.008);
             hprofile_eta_res_grandmother_3mu->SetErrorOption("");
             hprofile_eta_res_grandmother_3mu->SetStats(false);
@@ -499,7 +533,7 @@ int DiscriminantsPlotter(vector<MarkedNames> file2read,
                                                                                                 {"abs_mu1_grandmother_eta", "phi_resolution_grandmother_beambreco"});
             hprofile_phi_res_grandmother_beambreco->SetTitle("Different resolutions for various eta regions");
             hprofile_phi_res_grandmother_beambreco->GetXaxis()->SetTitle("|#eta_{Grandmother}|[]");
-            hprofile_phi_res_grandmother_beambreco->GetYaxis()->SetTitle("Resolution");
+            hprofile_phi_res_grandmother_beambreco->GetYaxis()->SetTitle("#phi_{Grandmother}-#phi_{Reconstructed}");
             hprofile_phi_res_grandmother_beambreco->GetYaxis()->SetRangeUser(-0.006, 0.008);
             hprofile_phi_res_grandmother_beambreco->SetErrorOption("");
             hprofile_phi_res_grandmother_beambreco->SetStats(false);
@@ -515,7 +549,7 @@ int DiscriminantsPlotter(vector<MarkedNames> file2read,
                                                                                          8, 0, 2.4, -0.1, 0.1), 
                                                                                          {"abs_mu1_grandmother_eta", "phi_resolution_grandmother_3mumomentareco"});
             hprofile_phi_res_grandmother_3mu->GetXaxis()->SetTitle("|#eta_{Grandmother}|[]");
-            hprofile_phi_res_grandmother_3mu->GetYaxis()->SetTitle("Resolution");
+            hprofile_phi_res_grandmother_3mu->GetYaxis()->SetTitle("#phi_{Grandmother}-#phi_{Reconstructed}");
             hprofile_phi_res_grandmother_3mu->GetYaxis()->SetRangeUser(-0.006, 0.008);
             hprofile_phi_res_grandmother_3mu->SetErrorOption("");
             hprofile_phi_res_grandmother_3mu->SetStats(false);

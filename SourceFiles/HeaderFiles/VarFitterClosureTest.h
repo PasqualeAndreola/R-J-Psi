@@ -1,10 +1,10 @@
 /*! 
- *  \file NormalizationHybrid.h 
- *  \brief Header file for \ref NormalizationHybrid function
+ *  \file VarFitterClosureTest.h 
+ *  \brief Header file for \ref VarFitterClosureTest function
  */
 
-#ifndef NORMALIZATIONHYBRID_H
-#define NORMALIZATIONHYBRID_H
+#ifndef VARFITTERCLOSURETEST_H
+#define VARFITTERCLOSURETEST_H
 
 #include "VarToBeFitted.h"
 #include <iostream>
@@ -47,15 +47,11 @@
 #include <RooProdPdf.h>
 #include <RooDataSet.h>
 #include <RooMinimizer.h>
-#include <RooChebychev.h>
-#include <RooArgusBG.h>
-#include <RooFFTConvPdf.h>
-#include <RooGaussian.h>
-#include <RooChi2Var.h>
 
 /*These namespaces can be useful*/
 using namespace std;
 
-int NormalizationHybrid(bool debug = false);
+int VarFitterClosureTest(vector<VarToBeFitted> *tobediscriminated,
+              bool debug = false);
 
 #endif
